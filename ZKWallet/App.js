@@ -36,7 +36,7 @@ const App: () => Node = () => {
       'message',
       msg => {
         //setMesage(msg);
-        console.warn('From node: ' + msg);
+        console.warn(JSON.stringify(msg));
       },
       this,
     );
