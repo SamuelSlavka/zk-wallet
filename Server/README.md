@@ -9,5 +9,9 @@ REST API backend communicating with psql and sqlalchemy.
 #### Starting server:
     flask run
   
- #### Execution:
-   http://localhost:5000/<query>
+#### Starting the whole system:
+    make setup/start
+
+
+#### Execution:
+   http://localhost:5000/api/<query>

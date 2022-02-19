@@ -21,7 +21,7 @@ import {
 
 const App: () => Node = () => {
   const [mounted, setMounted] = useState(false);
-  const [message, setMesage] = useState('init');
+  const [message, setMesage] = useState([]);
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -35,8 +35,7 @@ const App: () => Node = () => {
     nodejs.channel.addListener(
       'message',
       msg => {
-        //setMesage(msg);
-        console.warn(JSON.stringify(msg));
+        setMesage([...message, JSON.stringify(msg)]);
       },
       this,
     );
@@ -53,7 +52,9 @@ const App: () => Node = () => {
         style={backgroundStyle}>
         <View style={styles.sectionContainer}>
           <Text style={[styles.sectionTitle]}>ZKWallet</Text>
-          <Text style={[styles.sectionDescription]}>{message}</Text>
+          {message.map(item => {
+            return <Text key={item}>{item}</Text>;
+          })}
         </View>
         <Button
           title="Message Node"

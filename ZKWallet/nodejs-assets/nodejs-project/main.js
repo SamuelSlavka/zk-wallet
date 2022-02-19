@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 /**
- * Main nodejs files
+ * Main nodejs blockchain connection files
  * communication based on https://github.com/ethereumjs/ethereumjs-monorepo/blob/master/packages/devp2p/examples/peer-communication-les.ts
  *
  * @format
@@ -25,12 +26,12 @@ const BlockHeader = blockLib.BlockHeader;
 const PRIVATE_KEY = randomBytes(32);
 const GENESIS_TD = 1;
 const GENESIS_HASH = Buffer.from(
-  '6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
+  'd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3',
   'hex',
 );
 
 const common = new Common.default({
-  chain: Chain.Rinkeby,
+  chain: Chain.Mainnet,
   hardfork: Hardfork.London,
 });
 
@@ -57,8 +58,9 @@ const BOOTNODES = bootstrapNodes.map(node => {
   };
 });
 
-const getPeerAddr = peer =>
-  `${peer._socket.remoteAddress}:${peer._socket.remotePort}`;
+const getPeerAddr = peer => {
+  return `${peer._socket.remoteAddress}:${peer._socket.remotePort}`;
+};
 
 // DPT
 const dpt = new devp2p.DPT(PRIVATE_KEY, {
@@ -75,17 +77,19 @@ dpt.on('error', err => {});
 
 // RLPx
 const rlpx = new devp2p.RLPx(PRIVATE_KEY, {
-  dpt,
+  dpt: dpt,
   maxPeers: 25,
-  capabilities: [devp2p.LES.les4],
-  common,
+  capabilities: [devp2p.LES.les3],
+  common: common,
   remoteClientIdFilter: REMOTE_CLIENTID_FILTER,
+  listenPort: null,
 });
 
 rlpx.on('error', err => {});
 //rn_bridge.channel.send(`RLPx error: ${err.stack || err}`));
 
 rlpx.on('peer:added', peer => {
+  console.log('Add peer');
   const addr = getPeerAddr(peer);
   const les = peer.getProtocols()[0];
   const requests = {
@@ -107,36 +111,27 @@ rlpx.on('peer:added', peer => {
     headHash: GENESIS_HASH,
     headNum: Buffer.from([]),
     genesisHash: GENESIS_HASH,
-    announceType: devp2p.int2buffer(0),
-    recentTxLookup: devp2p.int2buffer(1),
-    forkID: [Buffer.from('3b8e0691', 'hex'), devp2p.int2buffer(1)],
   });
 
-  les.once('status', status => {
-    console.log(status);
-    const msg = [0, [devp2p.buffer2int(status.headNum), 1, 0, 1]];
-    les.sendMessage(devp2p.LES.MESSAGE_CODES.GET_BLOCK_HEADERS, msg);
+  les.once('status', (status: LES.Status) => {
+    const msg = [devp2p.buffer2int(status.headNum), 1, 0, 1];
+    les.sendMessage(devp2p.LES.MESSAGE_CODES.GET_BLOCK_HEADERS, 1, msg);
   });
 
-  les.on('message', async (code, payload) => {
-    console.log(code);
+
+  les.on('message', async (code: LES.MESSAGE_CODES, payload: any) => {
     switch (code) {
       case devp2p.LES.MESSAGE_CODES.BLOCK_HEADERS: {
         if (payload[2].length > 1) {
-          //rn_bridge.channel.send
           console.log(
-            `${addr} not more than one block header expected (received: ${payload[2].length})`,
+            `${addr} not more than one block header expected (received: ${payload[2].length})`
           );
-
           break;
         }
-        const header = BlockHeader.fromValuesArray(payload[2][0], {common});
+        const header = BlockHeader.fromValuesArray(payload[2][0], {});
 
         setTimeout(() => {
-          les.sendMessage(devp2p.LES.MESSAGE_CODES.GET_BLOCK_BODIES, [
-            1,
-            [header.hash()],
-          ]);
+          les.sendMessage(devp2p.LES.MESSAGE_CODES.GET_BLOCK_BODIES, 2, [header.hash()]);
           requests.bodies.push(header);
         }, ms('0.1s'));
         break;
@@ -144,9 +139,8 @@ rlpx.on('peer:added', peer => {
 
       case devp2p.LES.MESSAGE_CODES.BLOCK_BODIES: {
         if (payload[2].length !== 1) {
-          //rn_bridge.channel.send
           console.log(
-            `${addr} not more than one block body expected (received: ${payload[2].length})`,
+            `${addr} not more than one block body expected (received: ${payload[2].length})`
           );
           break;
         }
@@ -154,10 +148,7 @@ rlpx.on('peer:added', peer => {
         const header2 = requests.bodies.shift();
         const txs = payload[2][0][0];
         const uncleHeaders = payload[2][0][1];
-        const block = Block.fromValuesArray(
-          [header2.raw(), txs, uncleHeaders],
-          {common},
-        );
+        const block = Block.fromValuesArray([header2.raw(), txs, uncleHeaders]);
         const isValid = await isValidBlock(block);
         let isValidPayload = false;
         if (isValid) {
@@ -167,7 +158,6 @@ rlpx.on('peer:added', peer => {
         }
 
         if (!isValidPayload) {
-          //rn_bridge.channel.send
           console.log(`${addr} received wrong block body`);
         }
         break;
@@ -190,9 +180,7 @@ rlpx.on('peer:removed', (peer, reasonCode, disconnectWe) => {
 });
 
 rlpx.on('peer:error', (peer, err) => {
-  if (err.code === 'ECONNRESET') {
-    return;
-  }
+  if (err.code === 'ECONNRESET') {return;}
 
   if (err instanceof assert.AssertionError) {
     const peerId = peer.getId();
@@ -235,11 +223,7 @@ for (const bootnode of BOOTNODES) {
 function onNewBlock(block, peer) {
   const blockHashHex = block.hash().toString('hex');
   const blockNumber = block.header.number.toNumber();
-
-  //rn_bridge.channel.send
-  console.log(
-    `block ${blockNumber} received: ${blockHashHex} (from ${getPeerAddr(peer)}`,
-  );
+  console.log(`block ${blockNumber} received: ${blockHashHex} (from ${getPeerAddr(peer)})`);
 }
 
 function isValidTx(tx) {

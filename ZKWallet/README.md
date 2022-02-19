@@ -1,12 +1,12 @@
 # ZKWallet - mobile application
 
-## setup
+## Setup
 
         npx react-native run-android
 
         npx react-native start
 
-## Emular (only for me :) )
+## Emular
 
          cd ~/Android/Sdk/emulator && ./emulator -avd Pixel_5_API_30
         
