@@ -1,0 +1,8 @@
+gunicorn 
+flask
+flask_cors
+web3
+psycopg2
+pip
+hexbytes
+jsonschema
