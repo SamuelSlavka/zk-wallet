@@ -4,6 +4,8 @@
 # OSX
 #
 .DS_Store
+postgres-data
+sql
 
 # Xcode
 #
