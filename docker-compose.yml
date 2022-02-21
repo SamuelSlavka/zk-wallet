@@ -13,7 +13,6 @@ services:
     networks:
       - app-network
 
-
   nginx:
     image: webapp-nginx
     build:
@@ -50,7 +49,7 @@ services:
     restart: unless-stopped
     ports:
       - 8080:8080
-
+    
   ethereum-geth:
     build:
       context: ./Geth

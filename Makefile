@@ -1,4 +1,5 @@
 setup:
+	USER=$(id -u) GROUP=$(id -g) 
 	docker-compose build
 	docker-compose up --remove-orphans
 start:
