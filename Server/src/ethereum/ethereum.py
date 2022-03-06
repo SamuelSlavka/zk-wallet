@@ -5,6 +5,8 @@ from web3.middleware import geth_poa_middleware
 from ..psql import *
 from ..constants import *
 from .utils import *
+from .grapQL import *
+from .header_manipulation import BlockHeader
 
 def init_eth_with_pk(privatekey):
     """ Initialize blockchain connection """
@@ -19,11 +21,21 @@ def init_eth_with_pk(privatekey):
 def get_last_transaction(web3):
     """ return last transaction form blockchain """
     try:
-        print('number: ', web3.eth.blockNumber)
         transaction = web3.eth.get_transaction_by_block(web3.eth.blockNumber, 0)
         tx_dict = dict(transaction)
         tx_json = json.dumps(tx_dict, cls=HexJsonEncoder)
         return tx_json
+    except Exception as err:
+        print("Error '{0}' occurred.".format(err))
+        return {'error':'Error while fetching transaction'}
+
+def create_proof(blockNumber):
+    """ create proof for block number """
+    try:
+        headers = getBlockHeaders(1,blockNumber)
+        for header in headers['blocks']:
+            print(BlockHeader(header))
+        return headers
     except Exception as err:
         print("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}

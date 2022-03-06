@@ -85,7 +85,7 @@ services:
         # Ethereum network
         "--rinkeby",
         # Maximum number of network peers (network disabled if set to 0) (default: 50)
-        "--maxpeers=30",
+        "--maxpeers=50",
         # Data directory for the databases and keystore (default: "/root/.ethereum")
         "--datadir=/home/aladdin/.ethereum"
       ]

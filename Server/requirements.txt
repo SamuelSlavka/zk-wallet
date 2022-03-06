@@ -6,3 +6,8 @@ psycopg2
 pip
 hexbytes
 jsonschema
+rlp
+eth-hash
+eth-typing
+eth-utils
+pandas

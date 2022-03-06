@@ -21,6 +21,12 @@ def lastTransaction():
     """ Returns last transaction on current blockchain """
     return ethereum.get_last_transaction(web3), 200
 
+
+@app.route('/createProof/')
+def createProof():
+    """ Creates proof for headers """
+    return ethereum.create_proof(1), 200
+
 # Run the server
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
