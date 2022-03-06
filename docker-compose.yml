@@ -55,6 +55,8 @@ services:
       context: ./Geth
       dockerfile: Dockerfile
     user: "$USER:$GROUP"
+    networks:
+      - app-network
     volumes:
       - ./Geth:/home/aladdin/.ethereum
       - '/etc/passwd:/etc/passwd:ro'
