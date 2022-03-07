@@ -1,5 +1,6 @@
 from flask import Flask
 from .ethereum import *
+from .bitcoin import *
 from .constants import *
 
 # Initialize flask app
@@ -22,10 +23,15 @@ def lastTransaction():
     return ethereum.get_last_transaction(web3), 200
 
 
-@app.route('/createProof/')
-def createProof():
+@app.route('/eth/')
+def createEthProof():
     """ Creates proof for headers """
-    return ethereum.create_proof(1), 200
+    return ethereum.create_proof(2), 200
+
+@app.route('/btc/')
+def createBtcProof():
+    """ Creates proof for headers """
+    return bitcoin.create_proof(2), 200
 
 # Run the server
 if __name__ == '__main__':

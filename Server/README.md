@@ -1,16 +1,14 @@
 # Flask backend
-REST API backend communicating with psql and sqlalchemy.
+REST API backend
 
 #### Setup:
-    source auth/bin/activate
-    python api.py
-
+    make init
   
-#### Starting server:
-    flask run
+#### Starting in development mode:
+    make setup
   
 #### Starting the whole system:
-    make setup/start
+    make start
 
 
 #### Execution:
