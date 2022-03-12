@@ -5,11 +5,11 @@ from web3.middleware import geth_poa_middleware
 from ..constants import *
 from .utils import *
 from .grapQL import *
-from .header_manipulation import BlockHeader
+from .eth_header_manipulation import BlockHeader
 
 def init_eth_with_pk(privatekey):
     """ Initialize blockchain connection """
-    web3 = Web3(Web3.HTTPProvider(PROVIDER))
+    web3 = Web3(Web3.HTTPProvider(ETHPROVIDER))
     # ONLY IN RINKEBY!!
     # web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 

@@ -4,11 +4,16 @@ DATABASE='postgres'
 USER='postgres'
 PASSWORD='postgres'
 
-#ETH
-TOKEN='REPLACEME'
-PROVIDER='https://ethshared.bdnodes.net?auth='+TOKEN
 PRIVATE_KEY='REPLACEME'
-GRAPH='https://ethshared.bdnodes.net/graphql'
+
+#ETH
+ETHTOKEN='REPLACEME'
+ETHPROVIDER='https://ethshared.bdnodes.net?auth='+ETHTOKEN
+ETHGRAPH='https://ethshared.bdnodes.net/graphql'
 
 #BTC
 BTCPROVIDER='https://btccore-main.bdnodes.net'
+
+#ZEC
+ZECPROVIDER='https://zec.getblock.io/mainnet/'
+ZECKEY='REPLACEME'

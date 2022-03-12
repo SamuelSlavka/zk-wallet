@@ -29,6 +29,6 @@ def getBlockHeaders(begining, end):
     }
     }
     """ % (begining, end)
-    url = GRAPH
-    response = requests.post(url, json={'query': query}, headers={'X-Auth-Token': TOKEN})
+    url = ETHGRAPH
+    response = requests.post(url, json={'query': query}, headers={'X-Auth-Token': ETHTOKEN})
     return json.loads(response.text)['data']

@@ -23,8 +23,8 @@ def getBlockHeaders(begining, end):
     # get block hashes
     payload = json.dumps([getPayload(block,block, 'getblockhash') for block in range(begining, end)])
     response = requests.post(BTCPROVIDER, headers=headers, data=payload, allow_redirects=False, timeout=30)
+    
     # get block headers
     payload = json.dumps([getPayload(block['id'], block['result'], 'getblock') for block in response.json()])
-    response = requests.post(BTCPROVIDER, headers=headers, data=payload, allow_redirects=False, timeout=30)
-
-    return response.content
+    response = requests.post(BTCPROVIDER, headers=headers, data=payload, allow_redirects=False, timeout=30).json()
+    return response
