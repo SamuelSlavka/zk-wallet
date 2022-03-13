@@ -11,12 +11,12 @@ def compile_contract():
     """ compile all contract files """
     try:
         # contract location
-        working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + '/Eth/'
+        working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + '/SmartContracts/'
         # compile contract
         process = subprocess.Popen(['truffle', 'compile'], cwd=working_directory + 'contracts/')
         process.wait()
 
-        with open(working_directory + 'build/contracts/MessageList.json', "r") as file:
+        with open(working_directory + 'build/contracts/HeaderList.json', "r") as file:
             contract = json.load(file)
         return contract
     except Exception as err:

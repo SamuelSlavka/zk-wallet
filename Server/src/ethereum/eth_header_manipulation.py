@@ -62,6 +62,9 @@ class BlockHeader(rlp.Serializable):
     ]
 
     def __init__(self, input) -> None:
+        # handling genesis block
+        if (input['parent'] == None):
+            input['parent'] = {'hash': str("{:064d}".format(0))}
         super().__init__(
             parent_hash=decode_hex(input['parent']['hash']),
             uncles_hash=decode_hex(input['ommerHash']),
@@ -89,4 +92,4 @@ class BlockHeader(rlp.Serializable):
     def hash(self) -> Hash32:
         if self._hash is None:
             self._hash = keccak(rlp.encode(self))
-        return cast(Hash32, self._hash)
+        return encode_hex(self._hash)

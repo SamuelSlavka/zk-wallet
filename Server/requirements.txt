@@ -11,3 +11,4 @@ eth-hash
 eth-typing
 eth-utils
 pandas
+bitstring

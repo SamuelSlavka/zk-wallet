@@ -1,5 +1,27 @@
-#1
+import "hashes/sha256/1024bit.zok" as sha256for1024
+import "hashes/sha256/sha256.zok" as sha256for256
 
-def main() {
+import "utils/pack/u32/unpack128.zok" as unpack128
+import "utils/pack/u32/pack256.zok" as pack256
 
-}
+// make two sha256 
+def hash_block_header(field[5] preimage) -> (u32[8]):
+    // abcde are the whole header 640b split into dour 128 parts to enable unpacking
+    u32[4] aPreimage = unpack128(preimage[0])
+    u32[4] bPreimage = unpack128(preimage[1])
+    u32[4] cPreimage = unpack128(preimage[2])
+    u32[4] dPreimage = unpack128(preimage[3])
+    u32[4] ePreimage = unpack128(preimage[4])
+    
+    // combined into 256b fields
+    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 ]
+    u32[8] preimage1 = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000 , ...aPreimage ]
+    u32[8] preimage2 = [ ...bPreimage, ...cPreimage ]
+    u32[8] preimage3 = [ ...dPreimage , ...ePreimage ]
+    
+    u32[8] intermediary = sha256for1024(dummy, preimage1, preimage2, preimage3)
+    return intermediary
+
+def main(field[5] header) -> (u32[8]):
+    u32[8] hash = hash_block_header(header)
+    return hash

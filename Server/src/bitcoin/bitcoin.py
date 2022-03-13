@@ -11,10 +11,13 @@ rpc_password = 'blockdaemon'
 def create_proof(blockNumber):
     """ create proof for block number """
     try:
-        headers = getBlockHeaders(125552,blockNumber)
+        headers = getBlockHeaders(0,blockNumber)
+        hashes = []
         for header in headers:
-            print(BlockHeader(header).hash)
-        return BlockHeader(headers[0]).hash
+            headerObj = BlockHeader(header)
+            headerObj.binaryHeader
+            hashes.append(headerObj.hash)
+        return json.dumps(hashes)
     except Exception as err:
         print("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}

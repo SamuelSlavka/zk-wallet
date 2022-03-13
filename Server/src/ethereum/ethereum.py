@@ -31,10 +31,11 @@ def get_last_transaction(web3):
 def create_proof(blockNumber):
     """ create proof for block number """
     try:
-        headers = getBlockHeaders(1,blockNumber)
+        headers = getBlockHeaders(0,blockNumber)
+        hashes = []
         for header in headers['blocks']:
-            print(BlockHeader(header))
-        return headers
+            hashes.append(BlockHeader(header).hash)
+        return json.dumps(hashes)
     except Exception as err:
         print("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}
