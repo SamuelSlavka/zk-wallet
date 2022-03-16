@@ -15,9 +15,8 @@ def create_proof(blockNumber):
         hashes = []
         for header in headers:
             headerObj = BlockHeader(header)
-            headerObj.zokratesInput
-            headerObj.zokratesTarget
-            headerObj.getBlockTarget()
+            print(headerObj.zokratesInput)
+            print(headerObj.getBlockTarget())
             hashes.append(headerObj.hash)
         return json.dumps(hashes)
     except Exception as err:

@@ -2,34 +2,52 @@ import "hashes/sha256/1024bit.zok" as sha256for1024
 import "hashes/sha256/256bitPadded.zok" as sha256for256
 
 import "utils/pack/u32/unpack128.zok" as unpack128
-import "utils/pack/u32/pack256.zok" as pack256
+import "utils/pack/bool/pack256.zok" as boolPack256
+import "utils/pack/u32/pack256.zok" as u32Pack256
 import "utils/casts/u32_from_bits.zok" as u32_from_bits
 import "utils/casts/u32_to_bits.zok" as u32_to_bits
-import "utils/casts/u32_to_field.zok" as u32_to_field
-import "utils/casts/field_to_u32.zok" as field_to_u32
 
-def check_exponent(field exponent) -> field:
-    u32 res = field_to_u32(exponent)
-    // 255 is max header value
-    for u32 i in 0..255 do
-        field result = (res == 0) ? 0 : 1
-        u32 tmp = res % 2
-        res = ( (result == 0) && (tmp == 0) ) ? res / 2 : 1
+// gets target exponent as input and checks if blocks head has number of zeros in binary target
+// as the header bits tail side only shifts head side by 2^(8*head-3)
+def check_exponent(bool[224] input, u32 expected) -> u32[2]:
+    u32 count = 0
+    u32 stop = 1
+    for u32 i in 0..223 do
+        stop = (input[223-i] == false) ? stop : 0 
+        count = count + stop
     endfor
-    return u32_to_field(res)
+    expected = 8*(expected - 3)
+    return [count,expected]
 
-def get_target(field preimage) -> field:
+// checks if target exponent has on the left side the tail from header
+def check_multiplier(bool[224] input, u32 expected, u32 exponent) -> u32[2]:
+    bool[32] res = [false; 32]
+    for u32 i in 0..223 do
+        res[i%32] = (i > (224-exponent)) ? res[i%32] : input[i]
+    endfor
+    u32 mul = u32_from_bits(res)
+    mul = mul >> 16
+    return [mul,expected]
+
+// target calculation is based on the folloing equation: tail * 2^(8*(head - 3))
+// retreives target from header and checks if input target was created by it
+def check_target(field preimage, bool[224] expectedTarget) -> bool:
     u32 bits = unpack128(preimage)[2]
     bool[32] boolBits = u32_to_bits(bits)
 
     bool[32] head = [...[false;24],...boolBits[24..32]]
     bool[32] tail = [...[false;8],...boolBits[16..24],...boolBits[8..16],...boolBits[0..8]]
     u32 inthead = u32_from_bits(head)
-    field fieldhead = u32_to_field(inthead)
-    field inttail = u32_to_field(u32_from_bits(tail))
-    return fieldhead
+    u32 inttail = u32_from_bits(tail)
 
-// make two sha256 
+    u32[2] exp = check_exponent(expectedTarget, inthead)
+    assert(exp[0] == exp[1])
+    u32[2] mul = check_multiplier(expectedTarget, inttail, exp[1])
+    assert(mul[0] == mul[1])
+
+    return true
+
+// make two sha256 on header
 def hash_block_header(field[5] preimage) -> (u32[8]):
     // abcde are the whole header 640b split into dour 128 parts to enable unpacking
     u32[4] aPreimage = unpack128(preimage[0])
@@ -43,15 +61,16 @@ def hash_block_header(field[5] preimage) -> (u32[8]):
     u32[8] preimage2 = [ ...cPreimage, ...dPreimage ]
     u32[8] preimage3 = [ ...ePreimage, 0x80000000,0x00000000,0x00000000,0x00000000 ]
 
-    return preimage3
-    //u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
+    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
     
-    //u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
-    //u32[8] res = sha256for256(intermediary)
-	//return res
+    u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
+    u32[8] res = sha256for256(intermediary)
+	return res
 
-def main(field[5] header, field fieldhead) -> field:
+def main(field[5] header, bool[224] expectedTarget) -> field[2]:
     u32[8] hash = hash_block_header(header)
-    field target = get_target(header[4])
-    field exp = check_exponent(fieldhead)
-    return exp
+    bool res = check_target(header[4], expectedTarget)
+    field target = boolPack256([...[false;32], ...expectedTarget])
+    field fieldHash = u32Pack256(hash)
+    assert(target > fieldHash)
+    return [target,fieldHash]
