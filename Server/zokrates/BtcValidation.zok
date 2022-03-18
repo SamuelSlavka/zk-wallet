@@ -1,0 +1,83 @@
+import "hashes/sha256/1024bit.zok" as sha256for1024
+import "hashes/sha256/256bitPadded.zok" as sha256for256
+
+import "utils/pack/u32/unpack128.zok" as unpack128
+import "utils/pack/bool/pack256.zok" as boolPack256
+import "utils/pack/u32/pack256.zok" as u32Pack256
+import "utils/casts/u32_from_bits.zok" as u32_from_bits
+import "utils/casts/u32_to_bits.zok" as u32_to_bits
+
+// gets target exponent as input and checks if blocks head has number of zeros in binary target
+// as the header bits tail side only shifts head side by 2^(8*head-3)
+def check_exponent(bool[224] input, u32 expected) -> u32[2]:
+    u32 count = 0
+    u32 stop = 1
+    for u32 i in 0..223 do
+        stop = (input[223-i] == false) ? stop : 0 
+        count = count + stop
+    endfor
+    expected = 8*(expected - 3)
+    return [count,expected]
+
+// checks if target exponent has on the left side the tail from header
+def check_multiplier(bool[224] input, u32 expected, u32 exponent) -> u32[2]:
+    bool[32] res = [false; 32]
+    for u32 i in 0..223 do
+        res[i%32] = (i > (224-exponent)) ? res[i%32] : input[i]
+    endfor
+    u32 mul = u32_from_bits(res)
+    mul = mul >> 16
+    return [mul,expected]
+
+// target calculation is based on the folloing equation: tail * 2^(8*(head - 3))
+// retreives target from header and checks if input target was created by it
+def check_target(u32 bits, bool[224] expectedTarget) -> bool:
+    // u32 bits = unpack128(preimage)[2]
+    bool[32] boolBits = u32_to_bits(bits)
+
+    bool[32] head = [...[false;24],...boolBits[24..32]]
+    bool[32] tail = [...[false;8],...boolBits[16..24],...boolBits[8..16],...boolBits[0..8]]
+    u32 inthead = u32_from_bits(head)
+    u32 inttail = u32_from_bits(tail)
+
+    u32[2] exp = check_exponent(expectedTarget, inthead)
+    assert(exp[0] == exp[1])
+    u32[2] mul = check_multiplier(expectedTarget, inttail, exp[1])
+    assert(mul[0] == mul[1])
+    return true
+
+// changes endianess in u32
+def change_val_endianness(u32 input) -> u32:
+    bool[32] boolInput = u32_to_bits(input)
+    bool[32] boolTruncated = [...boolInput[24..32],...boolInput[16..24],...boolInput[8..16],...boolInput[0..8]]
+    return u32_from_bits(boolTruncated)
+
+// changes endianess in u32 array
+def change_array_endainnes(u32[8] input) -> u32[8]:
+    u32[8] changed = input
+    for u32 i in 0..8 do
+        changed[7-i] = change_val_endianness(input[i])
+    endfor
+    return changed
+
+// make two sha256 on header
+def hash_block_header(u32[5][4] preimage) -> (u32[8]):    
+    // combined into 256b fields and add padding
+    u32[8] preimage1 = [ ...preimage[0], ...preimage[1] ]
+    u32[8] preimage2 = [ ...preimage[2], ...preimage[3] ]
+    u32[8] preimage3 = [ ...preimage[4], 0x80000000,0x00000000,0x00000000,0x00000000 ]
+
+    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
+    
+    u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
+    u32[8] res = sha256for256(intermediary)
+    res = change_array_endainnes(res)
+	return res
+
+def main(u32[5][4] header, bool[224] expectedTarget) -> field:
+    u32[8] hash = hash_block_header(header)
+    bool res = check_target(header[4][2], expectedTarget)
+    field target = boolPack256([...[false;32], ...expectedTarget])
+    field fieldHash = u32Pack256(hash)
+    assert(target > fieldHash)
+    return fieldHash

@@ -41,9 +41,8 @@ class BlockHeader:
     _zokratesTarget = None
 
     def getBlockTarget(self):
-        print(self.unhexBits)
-        print(getTarget(self.unhexBits))
-        return 0
+        print(bin(getTarget(self.unhexBits)))
+        return [( "false" if  (d == '0') else "true") for d in str(bin(getTarget(self.unhexBits)))[2:]]
 
     @property
     def header(self):
@@ -59,16 +58,19 @@ class BlockHeader:
         """ Returns binary representation of header """
         if self._zokratesHeader is None:
             # split to 5 parts with 128 bits (easier to split in binary :))
-            binHeader = "".join(f"{byte:08b}" for byte in self.header)
-            chunk_size = 128
-            splitHeader = [binHeader[i:i+chunk_size]
-                           for i in range(0, len(binHeader), chunk_size)]
-            # convert chunks to hex and then to string
+            chunk_size = 8
+            splitHeader = ['0x'+self.header.hex()[i:i+chunk_size]
+                           for i in range(0, len(self.header.hex()), chunk_size)]
+
+            splitHeader = [splitHeader[i:i + 4] for i in range(0, len(splitHeader), 4)]
+
+            # convert to string
             result = []
             for chunk in splitHeader:
-                result.append(str(int(chunk, 2)))
+                result.append(chunk)
             self._zokratesHeader = result
         return self._zokratesHeader
+
 
     @property
     def zokratesTarget(self):
