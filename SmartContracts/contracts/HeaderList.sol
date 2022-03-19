@@ -4,8 +4,8 @@ contract HeaderList {
     address public validationContract;
     uint private headerchainTop = 0;
 
-    constructor(address contractAddress) {
-        validationContract = contractAddress;
+    constructor(address validatorAddress) {
+        validationContract = validatorAddress;
     }
 
     struct Header {
@@ -21,10 +21,11 @@ contract HeaderList {
     // list of all headers defined by their number
     mapping(uint => Duplicates) private btcHeaders;
 
-    function validateProof(string hash, uint number, string zokratesInput) public {
+    function validateProof(uint256 hash, uint number, string zokratesInput) public {
         // leaving 10 block space for forks
-        if(number+10 > headerchainTop) {
-            Duplicates[] duplicateHeaders = headers[number];
+        // hash has to be at least under maximum target refs https://en.bitcoin.it/wiki/Target
+        if(number+10 > headerchainTop && hash > 0x00000000FFFF0000000000000000000000000000000000000000000000000000) {
+            Duplicates[] duplicateHeaders = btcHeaders[number];
             if(callValidatorContract(zokratesInput)) {
                 duplicateHeaders[hash] = Header(hash,number);
             }
@@ -34,6 +35,7 @@ contract HeaderList {
     function callValidatorContract(string zkInput) {
 
     }
+
     function appendHeader(Header result) public {
         require(msg.sender == validationContract);
     }
