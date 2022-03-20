@@ -17,6 +17,9 @@ import {
   Text,
   useColorScheme,
   View,
+  NativeModules,
+  Button,
+  Alert,
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -67,8 +70,16 @@ const App = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+            <View>
+              <Button
+                title="button"
+                onPress={() => {
+                  NativeModules.CommunicationNative.test('str', (str: any) => {
+                    Alert.alert(str);
+                  });
+                }}
+              />
+            </View>
           </Section>
         </View>
       </ScrollView>

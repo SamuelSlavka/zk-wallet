@@ -1,3 +1,6 @@
+// React native cli communication package with geth
+// refs https://www.zupzup.org/react-native-ethereum/
+
 package com.zkwallet;
 
 import com.facebook.react.ReactPackage;
@@ -9,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TestPackage implements ReactPackage {
+public class CommunicationPackage implements ReactPackage {
   public List<Class<? extends JavaScriptModule>> createJSModules() {
     return Collections.emptyList();
   }
@@ -23,7 +26,7 @@ public class TestPackage implements ReactPackage {
   public List<NativeModule> createNativeModules(
       ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    modules.add(new TestNative(reactContext));
+    modules.add(new CommunicationNative(reactContext));
     return modules;
   }
 }
