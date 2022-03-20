@@ -17,14 +17,9 @@ import {
   Text,
   useColorScheme,
   View,
-  Alert,
-  Button,
-  NativeModules
 } from 'react-native';
 
-import {
-  Colors
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const Section: React.FC<{
   title: string;
@@ -72,12 +67,8 @@ const App = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Section title="Step One">
-            <Button title="button" onPress={() => {
-              Alert.alert('str');
-              NativeModules.TestNative.test("Hello!", (str: any) => {
-                Alert.alert(str);
-              })
-            }}></Button>
+            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
+            screen and then come back to see your edits.
           </Section>
         </View>
       </ScrollView>
