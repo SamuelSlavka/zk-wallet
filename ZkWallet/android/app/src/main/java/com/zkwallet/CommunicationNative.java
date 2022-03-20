@@ -33,8 +33,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
                 NodeInfo info = node.getNodeInfo();
                 EthereumClient ethereumClient = node.getEthereumClient();
                 Account newAcc = nh.getAcc();
-                //BigInt balanceAt = ethereumClient.getBalanceAt(ctx, new Address("0x22B84d5FFeA8b801C0422AFe752377A64Aa738c2"), -1);
-                //cb.invoke(balanceAt.toString() + " ether found address:" + newAcc.getAddress().getHex());
+                cb.invoke(info.getListenerAddress().toString());
                 return;
             }
             cb.invoke("node was null");
