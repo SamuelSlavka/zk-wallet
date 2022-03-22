@@ -8,9 +8,20 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 
+import android.util.Log;
+
+import com.facebook.react.ReactActivity;
+
 import org.ethereum.geth.*;
 
+import org.ethereum.geth.Account;
+import org.ethereum.geth.Geth;
+import org.ethereum.geth.KeyStore;
+import org.ethereum.geth.Node;
+import org.ethereum.geth.NodeConfig;
+
 import android.util.*;
+import android.os.Bundle;
 import android.widget.Toast;
 
 public class CommunicationNative extends ReactContextBaseJavaModule {
@@ -24,7 +35,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void test(String message, Callback cb) {
+    public void getAddress(String message, Callback cb) {
         try {
             NodeHolder nh = NodeHolder.getInstance();
             Node node = nh.getNode();
@@ -33,7 +44,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
                 NodeInfo info = node.getNodeInfo();
                 EthereumClient ethereumClient = node.getEthereumClient();
                 Account newAcc = nh.getAcc();
-                cb.invoke(info.getIP().toString()+' '+info.getListenerAddress().toString());
+                cb.invoke(info.getListenerAddress().toString());
                 return;
             }
             cb.invoke("node was null");
@@ -49,11 +60,10 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         // creates a new account and exports it
         try {
             NodeHolder nh = NodeHolder.getInstance();
-            Node node = nh.getNode();
-            KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
 
             Account newAcc = ks.newAccount(creationPassword);
-            node.setAcc(newAcc);
+            nh.setAcc(newAcc);
 
             byte[] jsonAcc = ks.exportKey(newAcc, creationPassword, exportPassword);
             cb.invoke(new String(jsonAcc));
@@ -65,15 +75,14 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void loadAccount(String exportPassword, String importPassword, Callback cb) {
+    public void loadAccount(String keyfile, String exportPassword, String importPassword, Callback cb) {
         // imports account from json and two passwods
         try {
-            NodeHolder nh = NodeHolder.getInstance();    
-            Node node = nh.getNode();        
-            KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
+            NodeHolder nh = NodeHolder.getInstance();   
+            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
 
-			Account impAcc = ks.importKey(jsonAcc, exportPassword, importPassword);
-            node.setAcc(impAcc);
+			Account impAcc = ks.importKey(keyfile.getBytes(), exportPassword, importPassword);
+            nh.setAcc(impAcc);
 
             byte[] jsonAcc = ks.exportKey(impAcc, importPassword, exportPassword);
             cb.invoke(new String(jsonAcc));
@@ -85,25 +94,20 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void callContract(String contractAddress, String importPassword, Callback cb) {
+    public void callContract(CallMsg msg, String contractAddress, String myAddress, String importPassword, Callback cb) {
         // callsContract with message
         try {
             NodeHolder nh = NodeHolder.getInstance(); 
             Node node = nh.getNode();           
             EthereumClient ec = node.getEthereumClient();
             Context ctx = new Context();
+            
+            cb.invoke(ec);
 
-            msg = new CallMsg(
-                contractAddress,
-                new Address(),
-                21000,
-                big.NewInt(1000000000),
-                big.NewInt(1)
-            );
+            // BigInt balanceAt = ec.getDeclaredMethods() //.getBalanceAt(ctx, new Address("0x22B84d5FFeA8b801C0422AFe752377A64Aa738c2"), -1);
+            // byte[] res = ec.CallContract(ctx, msg, 0);
 
-            ec.CallContract(ctx, msg, big.NewInt(0));            
-
-            cb.invoke(new String(jsonAcc));
+            cb.invoke("called");
         } catch (Exception e) {
             cb.invoke("error: ", e.getMessage());
             android.util.Log.d("error: ", e.getMessage());

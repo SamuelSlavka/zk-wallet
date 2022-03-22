@@ -6,6 +6,7 @@ import org.ethereum.geth.Node;
 public class NodeHolder {
     private Node node;
     private Account acc;
+    private java.io.File filesDir;
     private static NodeHolder instance = null;
 
     private NodeHolder() {
@@ -32,5 +33,13 @@ public class NodeHolder {
 
     public void setAcc(Account acc) {
         this.acc = acc;
+    }
+
+    public java.io.File getFilesDir() {
+        return filesDir;
+    }
+
+    public void setFilesDir(java.io.File filesDir) {
+        this.filesDir = filesDir;
     }
 }

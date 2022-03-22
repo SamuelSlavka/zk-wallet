@@ -33,9 +33,12 @@ public class MainActivity extends ReactActivity {
     super.onCreate(savedInstanceState);
     try {
       NodeConfig nodeConfig = Geth.newNodeConfig();
+      NodeHolder nh = NodeHolder.getInstance();
+
       Node node = Geth.newNode(getFilesDir() + "/.ethereum", nodeConfig);
       node.start();
-      NodeHolder nh = NodeHolder.getInstance();
+      
+      nh.setFilesDir(getFilesDir());
       nh.setNode(node);
     } catch (Exception e) {
       Log.d("fail", "what happened?" + e.getMessage());
