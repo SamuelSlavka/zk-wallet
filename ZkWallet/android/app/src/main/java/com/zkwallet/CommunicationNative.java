@@ -35,7 +35,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getAddress(String message, Callback cb) {
+    public void getAddress(Callback cb) {
         try {
             NodeHolder nh = NodeHolder.getInstance();
             Node node = nh.getNode();
@@ -44,7 +44,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
                 NodeInfo info = node.getNodeInfo();
                 EthereumClient ethereumClient = node.getEthereumClient();
                 Account newAcc = nh.getAcc();
-                cb.invoke(info.getListenerAddress().toString());
+                cb.invoke(info.getDiscoveryPort() + " " +  info.getListenerPort() + " " + info.getIP());
                 return;
             }
             cb.invoke("node was null");
@@ -94,23 +94,46 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void callContract(CallMsg msg, String contractAddress, String myAddress, String importPassword, Callback cb) {
+    public void callContract(String importPassword, Callback cb) {
         // callsContract with message
         try {
             NodeHolder nh = NodeHolder.getInstance(); 
-            Node node = nh.getNode();           
+            Node node = nh.getNode();
+            Account acc = nh.getAcc();
             EthereumClient ec = node.getEthereumClient();
             Context ctx = new Context();
-            
-            cb.invoke(ec);
-
-            // BigInt balanceAt = ec.getDeclaredMethods() //.getBalanceAt(ctx, new Address("0x22B84d5FFeA8b801C0422AFe752377A64Aa738c2"), -1);
+            //ec.getBalanceAt(ctx, , -1);
+            BigInt balanceAt = ec.getBalanceAt(ctx, acc.getAddress(), -1);
+            //ec.getBlockByNumber(ctx, -1).getNumber();
+            cb.invoke(balanceAt.getNumber());
             // byte[] res = ec.CallContract(ctx, msg, 0);
-
-            cb.invoke("called");
         } catch (Exception e) {
             cb.invoke("error: ", e.getMessage());
             android.util.Log.d("error: ", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    @ReactMethod
+    public void test(String message, Callback cb) {
+        Context ctx = new Context();
+        try {
+            android.util.Log.d("before", "yay");
+            NodeHolder nh = NodeHolder.getInstance();
+            Node node = nh.getNode();
+            if (node != null) {
+                NodeInfo info = node.getNodeInfo();
+                Account newAcc = nh.getAcc();
+
+                EthereumClient ec = node.getEthereumClient();
+                ec.getBlockByNumber(ctx, -1).getNumber();
+                cb.invoke("ok");
+                return;
+            }
+            cb.invoke("node was null");
+        } catch (Exception e) {
+            android.util.Log.d("", e.getMessage());
             e.printStackTrace();
         }
     }

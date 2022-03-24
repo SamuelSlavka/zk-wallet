@@ -31,13 +31,14 @@ public class MainActivity extends ReactActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+		Context ctx = new Context();
     try {
       NodeConfig nodeConfig = Geth.newNodeConfig();
       NodeHolder nh = NodeHolder.getInstance();
 
       Node node = Geth.newNode(getFilesDir() + "/.ethereum", nodeConfig);
       node.start();
-      
+
       nh.setFilesDir(getFilesDir());
       nh.setNode(node);
     } catch (Exception e) {

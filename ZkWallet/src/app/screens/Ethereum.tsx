@@ -9,7 +9,7 @@ const Ethereum = () => {
       <Button
         title="get address"
         onPress={() => {
-          NativeModules.CommunicationNative.getAddress('str', (str: any) => {
+          NativeModules.CommunicationNative.getAddress((str: any) => {
             Alert.alert(str);
           });
         }}
@@ -17,17 +17,26 @@ const Ethereum = () => {
       <Button
         title="setup account"
         onPress={() => {
-          NativeModules.CommunicationNative.setupAccount('str', (str: any) => {
-            Alert.alert(str);
-          });
+          NativeModules.CommunicationNative.setupAccount(
+            'password',
+            'exportPassword',
+            (str: any) => {
+              Alert.alert(str);
+            },
+          );
         }}
       />
       <Button
         title="load account"
         onPress={() => {
-          NativeModules.CommunicationNative.loadAccount('str', (str: any) => {
-            Alert.alert(str);
-          });
+          NativeModules.CommunicationNative.loadAccount(
+            'setupResult',
+            'exportPassword',
+            'password',
+            (str: any) => {
+              Alert.alert(str);
+            },
+          );
         }}
       />
       <Button
