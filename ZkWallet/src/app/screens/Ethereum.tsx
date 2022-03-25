@@ -4,8 +4,17 @@ import '../utilities/global';
 import {NativeModules, Button, Alert} from 'react-native';
 
 const Ethereum = () => {
+  const jsonTransaction = '';
   return (
     <>
+      <Button
+        title="test"
+        onPress={() => {
+          NativeModules.CommunicationNative.test((str: any) => {
+            Alert.alert(str);
+          });
+        }}
+      />
       <Button
         title="get address"
         onPress={() => {
@@ -40,11 +49,30 @@ const Ethereum = () => {
         }}
       />
       <Button
-        title="call contract"
+        title="get balance"
         onPress={() => {
-          NativeModules.CommunicationNative.callContract('str', (str: any) => {
+          NativeModules.CommunicationNative.getBalance((str: any) => {
             Alert.alert(str);
           });
+        }}
+      />
+      <Button
+        title="call contract"
+        onPress={() => {
+          NativeModules.CommunicationNative.callContract((str: any) => {
+            Alert.alert(str);
+          });
+        }}
+      />
+      <Button
+        title="send transaction"
+        onPress={() => {
+          NativeModules.CommunicationNative.sendTransaction(
+            jsonTransaction,
+            (str: any) => {
+              Alert.alert(str);
+            },
+          );
         }}
       />
     </>

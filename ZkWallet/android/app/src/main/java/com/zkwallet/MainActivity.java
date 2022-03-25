@@ -15,6 +15,7 @@ import org.ethereum.geth.Node;
 import org.ethereum.geth.NodeConfig;
 
 import static org.ethereum.geth.Geth.*;
+import org.json.JSONObject;
 
 public class MainActivity extends ReactActivity {
 
@@ -31,12 +32,17 @@ public class MainActivity extends ReactActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-		Context ctx = new Context();
+    Context ctx = new Context();
     try {
       NodeConfig nodeConfig = Geth.newNodeConfig();
-      NodeHolder nh = NodeHolder.getInstance();
+      // rinkeby
+      nodeConfig.setEthereumNetworkID(4);
+      String genesis = Geth.rinkebyGenesis();
+      nodeConfig.setEthereumGenesis(genesis);
 
-      Node node = Geth.newNode(getFilesDir() + "/.ethereum", nodeConfig);
+      Node node = Geth.newNode(getFilesDir() + "/.rinkeby", nodeConfig);
+
+      NodeHolder nh = NodeHolder.getInstance();
       node.start();
 
       nh.setFilesDir(getFilesDir());
@@ -44,6 +50,6 @@ public class MainActivity extends ReactActivity {
     } catch (Exception e) {
       Log.d("fail", "what happened?" + e.getMessage());
     }
-
+  
   }
 }

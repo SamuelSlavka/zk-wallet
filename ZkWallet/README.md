@@ -1,4 +1,5 @@
 # React native wallet with local ethereum light node
+Inherently runs in reinkeby testnet (defined in MainActivity)
 
 
 ## run app
@@ -9,5 +10,6 @@
     yarn react-native start
 
 
-## run emulator (for me :))
+## dev env (for me :))
     cd ~/Android/Sdk/emulator && ./emulator -avd Pixel_5_API_30
+    adb logcat
