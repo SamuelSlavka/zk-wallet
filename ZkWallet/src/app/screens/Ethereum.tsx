@@ -1,59 +1,63 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  getBalance,
+  loadAccount,
+  newAccount,
+  getAddress,
+} from '../redux/actions';
+import {RootState} from '../redux/store';
 
-import '../utilities/global';
-import {NativeModules, Button, Alert} from 'react-native';
+import {NativeModules, Button, Alert, Text, SafeAreaView} from 'react-native';
 
 const Ethereum = () => {
-  const jsonTransaction = '';
+  const {ethBalance, keyfile, ethAddress} = useSelector(
+    (state: RootState) => state.ethereumReducer,
+  );
+  const dispatch = useDispatch();
+
+  const getEthBalance = () => dispatch(getBalance());
+  const getEthAddress = () => dispatch(getAddress());
+  const newEthAccount = (password: string, exportPassword: string) =>
+    dispatch(newAccount(password, exportPassword));
+  const loadEthAccount = (
+    setupResult: string,
+    password: string,
+    exportPassword: string,
+  ) => dispatch(loadAccount(setupResult, password, exportPassword));
+
+  useEffect(() => {
+    console.log(keyfile);
+    // create new account if empty or broken
+    if (keyfile === '' || keyfile === 'error') {
+      newEthAccount('password', 'exportPassword');
+    }
+    getEthBalance();
+    getEthAddress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <>
+    <SafeAreaView>
+      <Text>{ethAddress}</Text>
+      <Text>{ethBalance}</Text>
       <Button
-        title="test"
+        title="refresh"
         onPress={() => {
-          NativeModules.CommunicationNative.test((str: any) => {
-            Alert.alert(str);
-          });
-        }}
-      />
-      <Button
-        title="get address"
-        onPress={() => {
-          NativeModules.CommunicationNative.getAddress((str: any) => {
-            Alert.alert(str);
-          });
+          getEthBalance();
+          getEthAddress();
         }}
       />
       <Button
         title="setup account"
         onPress={() => {
-          NativeModules.CommunicationNative.setupAccount(
-            'password',
-            'exportPassword',
-            (str: any) => {
-              Alert.alert(str);
-            },
-          );
+          newEthAccount('password', 'exportPassword');
         }}
       />
       <Button
         title="load account"
         onPress={() => {
-          NativeModules.CommunicationNative.loadAccount(
-            'setupResult',
-            'exportPassword',
-            'password',
-            (str: any) => {
-              Alert.alert(str);
-            },
-          );
-        }}
-      />
-      <Button
-        title="get balance"
-        onPress={() => {
-          NativeModules.CommunicationNative.getBalance((str: any) => {
-            Alert.alert(str);
-          });
+          loadEthAccount(keyfile, 'password', 'exportPassword');
         }}
       />
       <Button
@@ -67,15 +71,19 @@ const Ethereum = () => {
       <Button
         title="send transaction"
         onPress={() => {
+          // String password, String receiver, int amount, String jsonTransaction, String data_string
           NativeModules.CommunicationNative.sendTransaction(
-            jsonTransaction,
+            'password',
+            '0xa7e4ef0a9e15bdef215e2ed87ae050f974ecd60b',
+            0.0001,
+            'data',
             (str: any) => {
               Alert.alert(str);
             },
           );
         }}
       />
-    </>
+    </SafeAreaView>
   );
 };
 

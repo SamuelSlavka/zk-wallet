@@ -2,12 +2,12 @@ import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 
-import Ethereum from './app/screens/Ethereum';
-import Bitcoin from './app/screens/Bitcoin';
+import Ethereum from '../screens/Ethereum';
+import Bitcoin from '../screens/Bitcoin';
 
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+const RootNavigator = () => {
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -24,4 +24,6 @@ export default function App() {
       </Tab.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default RootNavigator;

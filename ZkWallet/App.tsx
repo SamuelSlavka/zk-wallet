@@ -1,9 +1,16 @@
-/* eslint-disable prettier/prettier */
 import * as React from 'react';
-import Home from './src/Home';
+import {Provider} from 'react-redux';
+import RootNavigator from './src/app/navigation/RootNavigator';
+import {PersistGate} from 'redux-persist/integration/react';
+
+import {store, persistor} from './src/app/redux/store';
 
 export default function App() {
   return (
-    <Home />
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <RootNavigator />
+      </PersistGate>
+    </Provider>
   );
 }

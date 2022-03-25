@@ -34,40 +34,16 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void test(Callback cb) {
-        try {
-            NodeConfig nodeConfig = Geth.newNodeConfig();
-            nodeConfig.setEthereumNetworkID(4);
-            String genesis = Geth.rinkebyGenesis();
-            nodeConfig.setEthereumGenesis(genesis);
-            cb.invoke(nodeConfig.string());
-
-            android.util.Log.d("out: ", nodeConfig.string());
-        } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-
-    @ReactMethod
     public void getAddress(Callback cb) {
         try {
             NodeHolder nh = NodeHolder.getInstance();
-            Node node = nh.getNode();
-            Context ctx = new Context();
-            if (node != null) {
-                NodeInfo info = node.getNodeInfo();
-                EthereumClient ethereumClient = node.getEthereumClient();
-                Account newAcc = nh.getAcc();
-                cb.invoke(info.getDiscoveryPort() + " " +  info.getListenerPort() + " " + info.getIP());
-                return;
-            }
-            cb.invoke("node was null");
+            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
+            Account acc = ks.getAccounts().get(0);
+            
+            cb.invoke(acc.getAddress().getHex());
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -81,12 +57,14 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
 
             Account newAcc = ks.newAccount(creationPassword);
             nh.setAcc(newAcc);
-
+            ks.getAccounts().set(0, newAcc);
             byte[] jsonAcc = ks.exportKey(newAcc, creationPassword, exportPassword);
+
+            android.util.Log.d("ers: ", new String(jsonAcc));
             cb.invoke(new String(jsonAcc));
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -98,14 +76,13 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             NodeHolder nh = NodeHolder.getInstance();
             KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
 
-			Account impAcc = ks.importKey(keyfile.getBytes(), exportPassword, importPassword);
+            Account impAcc = ks.importKey(keyfile.getBytes(), exportPassword, importPassword);
             nh.setAcc(impAcc);
-
             byte[] jsonAcc = ks.exportKey(impAcc, importPassword, exportPassword);
             cb.invoke(new String(jsonAcc));
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke(e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -116,14 +93,15 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         try {
             NodeHolder nh = NodeHolder.getInstance(); 
             Node node = nh.getNode();
-            Account acc = nh.getAcc();
+            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
+            Account acc = ks.getAccounts().get(0);
             EthereumClient ec = node.getEthereumClient();
             Context ctx = new Context();
             BigInt balanceAt = ec.getBalanceAt(ctx, acc.getAddress(), -1);
             cb.invoke(balanceAt.string());
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -141,14 +119,14 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             byte[] result = ec.callContract(ctx, msg, -1);
             cb.invoke(new String(result));
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
 
     @ReactMethod
-    public void sendTransaction(String password, String receiver, int amount, String jsonTransaction, String data_string, Callback cb) {
+    public void sendTransaction(String password, String receiver, int amount, String data_string, Callback cb) {
         // sends transaction to receiver with value
         Context ctx = new Context();
         try {
@@ -156,8 +134,8 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             Node node = nh.getNode();
             EthereumClient ec = node.getEthereumClient();
             KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore", Geth.LightScryptN, Geth.LightScryptP);
+            Account acc = ks.getAccounts().get(0);
 
-            Account acc = nh.getAcc();
             long nonce = ec.getPendingNonceAt(ctx, acc.getAddress());
 
             CallMsg msg = Geth.newCallMsg();
@@ -183,8 +161,8 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     
             //cb.invoke(balanceAt.string());
         } catch (Exception e) {
-            cb.invoke("error: ", e.getMessage());
-            android.util.Log.d("error: ", e.getMessage());
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
