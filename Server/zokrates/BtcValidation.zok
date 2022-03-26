@@ -1,7 +1,6 @@
 import "hashes/sha256/1024bit.zok" as sha256for1024
 import "hashes/sha256/256bitPadded.zok" as sha256for256
 
-import "utils/pack/u32/unpack128.zok" as unpack128
 import "utils/pack/bool/pack256.zok" as boolPack256
 import "utils/pack/u32/pack256.zok" as u32Pack256
 import "utils/casts/u32_from_bits.zok" as u32_from_bits
@@ -31,8 +30,7 @@ def check_multiplier(bool[224] input, u32 expected, u32 exponent) -> u32[2]:
 
 // target calculation is based on the folloing equation: tail * 2^(8*(head - 3))
 // retreives target from header and checks if input target was created by it
-def check_target(u32 bits, bool[224] expectedTarget) -> bool:
-    // u32 bits = unpack128(preimage)[2]
+def check_target(u32 bits, bool[224] expectedTarget) -> field:
     bool[32] boolBits = u32_to_bits(bits)
 
     bool[32] head = [...[false;24],...boolBits[24..32]]
@@ -44,7 +42,8 @@ def check_target(u32 bits, bool[224] expectedTarget) -> bool:
     assert(exp[0] == exp[1])
     u32[2] mul = check_multiplier(expectedTarget, inttail, exp[1])
     assert(mul[0] == mul[1])
-    return true
+    // return target if is valid
+    return boolPack256([...[false;32], ...expectedTarget])
 
 // changes endianess in u32
 def change_val_endianness(u32 input) -> u32:
@@ -61,7 +60,7 @@ def change_array_endainnes(u32[8] input) -> u32[8]:
     return changed
 
 // make two sha256 on header
-def hash_block_header(u32[5][4] preimage) -> (u32[8]):    
+def hash_block_header(u32[5][4] preimage) -> field:    
     // combined into 256b fields and add padding
     u32[8] preimage1 = [ ...preimage[0], ...preimage[1] ]
     u32[8] preimage2 = [ ...preimage[2], ...preimage[3] ]
@@ -72,12 +71,21 @@ def hash_block_header(u32[5][4] preimage) -> (u32[8]):
     u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
     u32[8] res = sha256for256(intermediary)
     res = change_array_endainnes(res)
-	return res
+	return u32Pack256(res)
 
-def main(u32[5][4] header, bool[224] expectedTarget) -> field:
-    u32[8] hash = hash_block_header(header)
-    bool res = check_target(header[4][2], expectedTarget)
-    field target = boolPack256([...[false;32], ...expectedTarget])
-    field fieldHash = u32Pack256(hash)
-    assert(target > fieldHash)
-    return fieldHash
+// return previous block hash from header
+def get_prev_hash(u32[8] hash) -> field:
+    u32[8] res = change_array_endainnes(hash)
+    return u32Pack256(res)
+
+// takes in epoch and vaildates it
+def main(u32[2][5][4] header, bool[2][224] expectedTarget, field previousHash) -> bool:
+    for u32 i in 0..2 do
+        field fieldHash = hash_block_header(header[i])
+        field target = check_target(header[i][4][2], expectedTarget[i])
+        field previousHashFromHeader = get_prev_hash( [...header[i][0][1..4],...header[i][1][0..4],header[i][2][0]])
+        assert(target > fieldHash)
+        assert(previousHash == previousHashFromHeader)
+        previousHash = fieldHash
+    endfor
+    return true

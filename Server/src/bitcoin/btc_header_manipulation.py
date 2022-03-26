@@ -40,9 +40,8 @@ class BlockHeader:
     _zokratesHeader = None
     _zokratesTarget = None
 
-    def getBlockTarget(self):
-        print(bin(getTarget(self.unhexBits)))
-        return [( "false" if  (d == '0') else "true") for d in str(bin(getTarget(self.unhexBits)))[2:]]
+    def zokratesBlockTarget(self):
+        return [( False if  (d == '0') else True) for d in str(bin(getTarget(self.unhexBits)))[2:]]
 
     @property
     def header(self):

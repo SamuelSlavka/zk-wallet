@@ -31,7 +31,7 @@ def createEthProof():
 @app.route('/btc/')
 def createBtcProof():
     """ Creates proof for headers """
-    return bitcoin.create_proof(4), 200
+    return bitcoin.create_proof(1,3), 200
 
 # Run the server
 if __name__ == '__main__':

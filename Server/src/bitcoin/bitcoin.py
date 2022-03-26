@@ -8,18 +8,20 @@ rpc_user = 'blockdaemon'
 rpc_password = 'blockdaemon'
 
 
-def create_proof(blockNumber):
+def create_proof(start,end):
     """ create proof for block number """
     try:
-        headers = getBlockHeaders(0,blockNumber)
+        firstHeader = getBlockHeaders(start-1,start)
+        headers = getBlockHeaders(start, end)
         hashes = []
+        zokratesHeaders = []
+        expectedTargets = []
         for header in headers:
             headerObj = BlockHeader(header)
-            print(headerObj.header.hex())
-            print(headerObj.zokratesInput)
-            print(headerObj.getBlockTarget())
+            zokratesHeaders.append(headerObj.zokratesInput)
+            expectedTargets.append(headerObj.zokratesBlockTarget())
             hashes.append(headerObj.hash)
-        return json.dumps(hashes)
+        return json.dumps({'headers': zokratesHeaders, 'targets': expectedTargets, 'firstHash': BlockHeader(firstHeader[0]).hash})
     except Exception as err:
         print("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}
