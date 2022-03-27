@@ -1,5 +1,6 @@
-init: 
+stopApache:
 	systemctl stop apache2.service
+init: 
 	USER=$(id -u) GROUP=$(id -g)
 	docker-compose build
 dev:

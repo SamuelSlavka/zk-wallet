@@ -1,0 +1,2 @@
+def main(bool[2][224] header) -> bool:
+    return true
