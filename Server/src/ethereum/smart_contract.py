@@ -1,4 +1,6 @@
 """ Smart contract creation and deployment interaction """
+# refs https://github.com/SamuelSlavka/slavkaone
+
 import json
 import subprocess
 import os
@@ -11,6 +13,7 @@ def compile_contract():
     """ compile all contract files """
     try:
         # contract location
+        print(os.path.split(os.path.split(os.getcwd())[0])[0] )
         working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + '/SmartContracts/'
         # compile contract
         process = subprocess.Popen(['truffle', 'compile'], cwd=working_directory + 'contracts/')

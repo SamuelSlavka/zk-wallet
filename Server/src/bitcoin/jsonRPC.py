@@ -1,3 +1,5 @@
+''' JSON rpc connection mangment '''
+
 import requests
 import json
 from ..constants import *
