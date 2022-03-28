@@ -1,5 +1,5 @@
 """ Header chain manipulation """
-# https://github.com/ethereum/py-evm/blob/master/eth/rlp/headers.py
+# refs https://github.com/ethereum/py-evm/blob/master/eth/rlp/headers.py
 
 import rlp
 from eth_hash.auto import keccak

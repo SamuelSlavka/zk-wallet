@@ -1,28 +1,10 @@
 ''' Bitcoin data handling '''
 
-import requests
-import ast
-import json
-from .jsonRPC import *
-from .btc_zok_utils import *
-from .btc_header_manipulation import BlockHeader
-import json
+from ..bitcoin.bitcoin import *
 import subprocess
-import shlex
 import os
 import subprocess
-from web3 import Web3
-from web3.middleware import geth_poa_middleware
-from hexbytes import HexBytes
 from ..constants import *
-
-def get_zk_input(start, end):
-    try:
-        zkInput = create_zok_input(start, end)
-        return json.dumps(zkInput)
-    except Exception as err:
-        print("Error '{0}' occurred.".format(err))
-        return {'error':'Error while fetching transaction'}
 
 def create_witness(start,end):
     """ Creates witneses of local execution """

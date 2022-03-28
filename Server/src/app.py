@@ -17,15 +17,10 @@ def home():
         return 'Hello there!'
     return 'Connection error'        
 
-@app.route('/last/')
+@app.route('/eth/')
 def lastTransaction():
     """ Returns last transaction on current blockchain """
     return get_last_transaction(web3), 200
-
-@app.route('/eth/')
-def createEthProof():
-    """ Creates proof for headers """
-    return create_proof(2), 200
 
 @app.route('/eth/deploy/')
 def dpeloyEthContract():
@@ -34,15 +29,10 @@ def dpeloyEthContract():
     print(build_and_deploy(web3.eth.default_account, web3))
     return 'ok', 200
 
-@app.route('/btc/witness')
+@app.route('/btc')
 def createBtcWitness():
     """ Creates proof for headers """
-    return create_witness(1,3), 200
-
-@app.route('/btc/compile')
-def compileBtcValidator():
-    """ Complies validation progam """
-    return compile_validator(), 200
+    return get_zk_input(1,3), 200
 
 # Run the server
 if __name__ == '__main__':

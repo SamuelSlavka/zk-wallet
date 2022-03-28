@@ -13,8 +13,7 @@ def compile_contract():
     """ compile all contract files """
     try:
         # contract location
-        print(os.path.split(os.path.split(os.getcwd())[0])[0] )
-        working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + '/SmartContracts/'
+        working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + 'src/smartContracts/'
         # compile contract
         process = subprocess.Popen(['truffle', 'compile'], cwd=working_directory + 'contracts/')
         process.wait()
