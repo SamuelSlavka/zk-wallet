@@ -1,5 +1,5 @@
 """ DB interaction """
-import psycopg2
+import psycopg2, logging
 from src.constants import *
 
 
@@ -38,7 +38,7 @@ def create_tables():
         conn.commit()
 
     except Exception as error:
-        print(error)
+        logging.error(error)
     finally:
         if conn is not None:
             conn.close()

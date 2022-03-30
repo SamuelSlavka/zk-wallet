@@ -30,9 +30,9 @@ contract HeaderList{
         uint totalDifficulty;
     }
 
-    function parseInput(uint[492] memory input) internal pure returns(Output memory) {
+    function parseInput(uint[22] memory input) internal pure returns(Output memory) {
         // last valuen in first header
-        uint256 prevHash = input[246];
+        uint256 prevHash = input[10];
         uint256 lastHash = input[0];
         uint256 difficulty = input[1];
         uint256 number = input[2];
@@ -45,7 +45,7 @@ contract HeaderList{
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[492] memory input) public {
+        uint[22] memory input) public {
 
         verifier.Verifier ver = new verifier.Verifier();
         verifier.Verifier.Proof memory proof = verifier.Verifier.Proof(

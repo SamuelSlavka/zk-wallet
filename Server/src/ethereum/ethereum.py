@@ -1,5 +1,5 @@
 """ Blockchain interaction """
-import json
+import json, logging
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
@@ -29,7 +29,7 @@ def get_last_transaction(web3):
         tx_json = json.dumps(tx_dict, cls=HexJsonEncoder)
         return tx_json
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}
 
 def create_proof(blockNumber):
@@ -41,5 +41,5 @@ def create_proof(blockNumber):
             hashes.append(BlockHeader(header).hash)
         return json.dumps(hashes)
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}

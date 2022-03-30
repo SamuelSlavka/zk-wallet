@@ -2,6 +2,7 @@
 
 from .jsonRPC import *
 from .btc_header_manipulation import BlockHeader
+import logging
 
 def create_zok_input(start,end):
     """ Get zok input for blocks """
@@ -20,5 +21,5 @@ def create_zok_input(start,end):
 
         return zkInput
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return {'error':'Error while fetching transaction'}

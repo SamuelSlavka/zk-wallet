@@ -1,17 +1,14 @@
 ''' Zokrates handling '''
 
-import subprocess, os
+import subprocess, os, logging
 
 def init_zokrates(working_directory):
     """ Install and init zokrates if missing """
+    os.environ['PATH'] = os.environ['PATH']+':'+os.environ['HOME']+'/.zokrates/bin'
+    os.environ['ZOKRATES_HOME'] = os.environ['HOME']+'/.zokrates/stdlib'
     if(subprocess.run('zokrates --version', shell=True, cwd=working_directory, capture_output=True).returncode != 0):
         # get zokrates
         subprocess.run('curl -LSfs get.zokrat.es | sh', shell=True, cwd=working_directory)
-        
-        os.environ['PATH'] = os.environ['PATH']+':'+os.environ['HOME']+'/.zokrates/bin'
-        os.environ['ZOKRATES_HOME'] = os.environ['HOME']+'/.zokrates/stdlib'
-        subprocess.run('export PATH=$PATH:$HOME/.zokrates/bin', shell=True)
-        subprocess.run('export ZOKRATES_HOME=$HOME/.zokrates/stdlib', shell=True)
         
 def compile_validator():
     """ Compile validator """
@@ -32,7 +29,7 @@ def compile_validator():
         subprocess.run('cp verifier.sol ../contracts/verifier.sol', shell=True, cwd=working_directory)
         return True
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return False
 
 def compute_witness():
@@ -45,5 +42,5 @@ def compute_witness():
             subprocess.run('zokrates compute-witness -a ' + data, shell=True, cwd=working_directory)
         return True
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return False

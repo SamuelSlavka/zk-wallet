@@ -1,7 +1,7 @@
 """ Smart contract creation and deployment interaction """
 # refs https://github.com/SamuelSlavka/slavkaone
 
-import json, subprocess, os, sys
+import json, subprocess, os, sys, logging
 
 sys.path.insert(0, os.getcwd()+'/Server/src/ethereum')
 
@@ -25,7 +25,7 @@ def compile_contract():
             contract = json.load(file)
         return contract
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return {'error': err}
 
 
@@ -37,13 +37,13 @@ def deploy_contract(contractInterface, account, w3):
             bytecode=contractInterface['bytecode'])
         
         gasPrice = w3.eth.generate_gas_price()
-        print(gasPrice)
+        logging.info(gasPrice)
         estgas = contract.constructor().estimateGas({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
             'gas': 2000000,
             'gasPrice': gasPrice})
-        print(estgas)
+        logging.info(estgas)
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,
@@ -61,14 +61,14 @@ def deploy_contract(contractInterface, account, w3):
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         return tx_receipt['contractAddress']
     except Exception as err:
-        print("Error '{0}' occurred.".format(err))
+        logging.error("Error '{0}' occurred.".format(err))
         return {'error': err}
 
 def build_and_deploy(account, w3):
     """ build and deploy contract """
     if w3.isConnected():
         contract = compile_contract()
-        print('Contract compiled')
+        logging.info('Contract compiled')
         data = {
             'abi': contract['abi'],
             'contract_address': deploy_contract(contract, account, w3)
