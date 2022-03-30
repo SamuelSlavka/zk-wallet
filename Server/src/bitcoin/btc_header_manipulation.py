@@ -49,8 +49,7 @@ class BlockHeader:
         # split traget to u64 values
         splitHeader = [int((newTarget)[i:i+chunk_size], 16)
                         for i in range(0, len(newTarget), chunk_size)]
-        splitHeaderStr = " ".join(str(x) for x in splitHeader)
-        print(splitHeaderStr)
+        splitHeaderStr = ' '.join(str(x) for x in splitHeader)
         return splitHeaderStr
 
     @property
@@ -64,20 +63,13 @@ class BlockHeader:
 
     @property
     def zokratesInput(self):
-        """ Returns binary representation of header """
+        """ Returns zokrates expected representation of header """
         if self._zokratesHeader is None:
-            # split to 5 parts with 128 bits (easier to split in binary :))
-            chunk_size = 8
+            # split to 5 parts with 128 bits to field values
+            chunk_size = 32
             splitHeader = [int(self.header.hex()[i:i+chunk_size], 16)
                            for i in range(0, len(self.header.hex()), chunk_size)]
-
-            splitHeader = [splitHeader[i:i + 4] for i in range(0, len(splitHeader), 4)]
-
-            # convert to string
-            result = []
-            for chunk in splitHeader:
-                result.append(chunk)
-            self._zokratesHeader = ' '.join(str(x) for x in sum(result, []))
+            self._zokratesHeader = ' '.join(str(x) for x in splitHeader)
         return self._zokratesHeader
 
 

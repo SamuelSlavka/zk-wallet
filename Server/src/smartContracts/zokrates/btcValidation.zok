@@ -3,6 +3,8 @@ import "hashes/sha256/256bitPadded.zok" as sha256for256
 
 import "utils/pack/bool/pack256.zok" as boolPack256
 import "utils/pack/u32/pack256.zok" as u32Pack256
+import "utils/pack/u32/unpack128.zok" as unpack128
+
 import "utils/casts/u32_from_bits.zok" as u32_from_bits
 import "utils/casts/u32_to_bits.zok" as u32_to_bits
 import "utils/casts/u64_to_bits.zok" as u64_to_bits
@@ -81,11 +83,18 @@ def get_prev_hash(u32[8] hash) -> field:
     return u32Pack256(res)
 
 // takes in epoch and vaildates it
-def main(u32[2][5][4] header, u64[2][4] expectedTarget, field previousHash, field[2] currentHash) -> bool:
+def main(field[2][5] fieldHeader, u64[2][4] expectedTarget, field previousHash, field[2] currentHash) -> bool:
+    
     for u32 i in 0..2 do
-        field currentHashFromHeader = hash_block_header(header[i])
-        field target = check_target(header[i][4][2], expectedTarget[i])
-        field previousHashFromHeader = get_prev_hash( [...header[i][0][1..4],...header[i][1][0..4],header[i][2][0]])
+        u32[4] header0 = unpack128(fieldHeader[i][0])
+        u32[4] header1 = unpack128(fieldHeader[i][1])
+        u32[4] header2 = unpack128(fieldHeader[i][2])
+        u32[4] header3 = unpack128(fieldHeader[i][3])
+        u32[4] header4 = unpack128(fieldHeader[i][4])
+
+        field currentHashFromHeader = hash_block_header([header0,header1,header2,header3,header4])
+        field target = check_target(header4[2], expectedTarget[i])
+        field previousHashFromHeader = get_prev_hash( [...header0[1..4],...header1[0..4],header2[0]])
         // hash needs to be under target
         assert(target > currentHashFromHeader)
         // hash needs to equal hash calculated in server
