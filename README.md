@@ -1,14 +1,16 @@
 # Mobile Cryptocurrency Wallet Based on zk-SNARKs and Smart Contracts
 
-## A client-server framework for mobile wallet that will utilize zk-SNARKs as a storage optimization technique.
+### A client-server framework for mobile wallet that will utilize zk-SNARKs as a storage optimization technique.
 
-### Server setup
+## Server setup
 #### build docker and compile zokratess program
     make init
 #### run dockerized flask
     make dev
 #### start flask and also local instance of geth light node
     make start
+
+## Smart contracts setup
 #### compile and setup zokrates
     make compile
 #### create witness for current smartContracts/zokrates/zokratesInput file
@@ -16,7 +18,7 @@
 #### deploy current vesion of smart contract in smartContracts/build/contracts (created in make compile)
     make deploy 
 
-### Client setup
+## Client setup
   Fully described in ZkWallet
   
     yarn react-native start
