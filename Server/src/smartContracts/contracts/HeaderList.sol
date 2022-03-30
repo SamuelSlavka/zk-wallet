@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 import './verifier.sol' as verifier;
 
-contract HeaderList {
-    address public validationContract;
+contract HeaderList{
     uint private headerchainTop = 0;
 
-    constructor(address validatorAddress) {
-        validationContract = validatorAddress;
-    }
     // batch containing last header hash and total difficulty
     struct Batch {
         uint256 lastHeaderHash;
@@ -28,33 +24,43 @@ contract HeaderList {
 
     //validation output
     struct Output {
-        bool result;
+        uint256 prevHash;
         uint256 lastHash;
         uint number;
         uint totalDifficulty;
     }
 
-    function validateProof(string memory zokratesInput) public {
-        // hash has to be at least under maximum target refs https://en.bitcoin.it/wiki/Target
-        Output memory output = callValidatorContract(zokratesInput);
+    function parseInput(uint[492] memory input) internal pure returns(Output memory) {
+        // last valuen in first header
+        uint256 prevHash = input[246];
+        uint256 lastHash = input[0];
+        uint256 difficulty = input[1];
+        uint256 number = input[2];
+
+        return Output(prevHash, lastHash, number, difficulty);
+    }
+
+
+    function validateProof(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[492] memory input) public {
+
+        verifier.Verifier ver = new verifier.Verifier();
+        verifier.Verifier.Proof memory proof = verifier.Verifier.Proof(
+            verifier.Pairing.G1Point(a[0],a[1]),
+            verifier.Pairing.G2Point(b[0],b[1]),
+            verifier.Pairing.G1Point(c[0],c[1])
+        );
+
+        require(ver.verifyTx(proof,input));
+        //require(verifierAddress.call(bytes4(sha3("verifyTx(types)")),a,b,c,input));
+        // hash has to be at least under maximum target refs https://en.bitcoin.it/wiki/Target         
+        Output memory output = parseInput(input);
         if(output.lastHash > 0x00000000FFFF0000000000000000000000000000000000000000000000000000) {
             Branch storage branch = branches[output.number];
-            
-            if(output.result) {
-                branch.batches[output.lastHash] = Batch(output.lastHash, output.totalDifficulty);
-            }
+            branch.batches[output.lastHash] = Batch(output.lastHash, output.totalDifficulty);
         }
-    }
-
-    function callValidatorContract(string memory zkInput) private view returns(Output memory) {
-        require(verifier.Verifier.verifyTx(zkInput));
-        return Output();
-    }
-
-    function appendBatchr(Batch memory batch) public {
-        
-    }
-
-    function getLatestHash() public {  
     }
 }

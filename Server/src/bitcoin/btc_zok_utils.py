@@ -10,11 +10,13 @@ def create_zok_input(start,end):
         headers = getBlockHeaders(start, end)
         zkHeaders = ''
         zkTargets = ''
+        zkHashaes = ''
         for header in headers:
             headerObj = BlockHeader(header)
             zkHeaders += (headerObj.zokratesInput) + ' '
             zkTargets += (headerObj.zokratesBlockTarget()) + ' '
-        zkInput = zkHeaders + zkTargets + ' ' + str(int(BlockHeader(firstHeader[0]).hash, 16))
+            zkHashaes += str(int(headerObj.hash, 16)) + ' '
+        zkInput = zkHeaders + zkTargets + ' ' + str(int(BlockHeader(firstHeader[0]).hash, 16)) + ' ' + zkHashaes
 
         return zkInput
     except Exception as err:

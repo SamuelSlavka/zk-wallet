@@ -4,7 +4,7 @@ import requests
 import json
 
 from numpy import number
-from ..constants import *
+from src.constants import *
 from types import SimpleNamespace
 
 def getBlockHeaders(begining, end):

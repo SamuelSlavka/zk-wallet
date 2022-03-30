@@ -1,6 +1,6 @@
 """ DB interaction """
 import psycopg2
-from ..constants import *
+from src.constants import *
 
 
 def connect_db():

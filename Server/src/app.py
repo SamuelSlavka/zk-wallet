@@ -1,19 +1,19 @@
 from flask import Flask
 
-from .ethereum import *
-from .bitcoin import *
-from .constants import *
+from src.ethereum import get_last_transaction, init_eth_with_pk
+from src.bitcoin import get_zk_input
+from src.constants import *
 
 # Initialize flask app
 app = Flask(__name__)
 app.debug = True
 
-web3 = init_eth_with_pk(PRIVATE_KEY)
+web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
 
 @app.route('/')
 @app.route('/api/')
 def home():
-    if web3.isConnected():
+    if(web3.isConnected()):
         return 'Hello there!'
     return 'Connection error'        
 
@@ -21,13 +21,6 @@ def home():
 def lastTransaction():
     """ Returns last transaction on current blockchain """
     return get_last_transaction(web3), 200
-
-@app.route('/eth/deploy/')
-def dpeloyEthContract():
-    """ Deploys smart contract """
-    web3 = init_eth_with_pk(PRIVATE_KEY)
-    print(build_and_deploy(web3.eth.default_account, web3))
-    return 'ok', 200
 
 @app.route('/btc')
 def createBtcWitness():

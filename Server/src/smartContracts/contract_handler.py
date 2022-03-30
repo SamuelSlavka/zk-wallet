@@ -1,22 +1,25 @@
 """ Smart contract creation and deployment interaction """
 # refs https://github.com/SamuelSlavka/slavkaone
 
-import json
-import subprocess
-import os
-from web3 import Web3
-from web3.middleware import geth_poa_middleware
-from hexbytes import HexBytes
-from ..constants import *
+import json, subprocess, os, sys
+
+sys.path.insert(0, os.getcwd()+'/Server/src/ethereum')
+
+from src.ethereum.ethereum import init_eth_with_pk
+from src.constants import *
+
 
 def compile_contract():
     """ compile all contract files """
     try:
+        # install truffle if missing
+        if(subprocess.run(('truffle version'), shell=True, capture_output=True).returncode != 0):
+            subprocess.run(('npm install -g truffle'), shell=True)
+
         # contract location
-        working_directory = os.path.split(os.path.split(os.getcwd())[0])[0] + 'src/smartContracts/'
+        working_directory = os.getcwd() + '/Server/src/smartContracts/'
         # compile contract
-        process = subprocess.Popen(['truffle', 'compile'], cwd=working_directory + 'contracts/')
-        process.wait()
+        subprocess.run(('truffle compile'), cwd=working_directory + 'contracts/', shell=True)
 
         with open(working_directory + 'build/contracts/HeaderList.json', "r") as file:
             contract = json.load(file)
@@ -32,13 +35,22 @@ def deploy_contract(contractInterface, account, w3):
         contract = w3.eth.contract(
             abi=contractInterface['abi'],
             bytecode=contractInterface['bytecode'])
-
+        
+        gasPrice = w3.eth.generate_gas_price()
+        print(gasPrice)
+        estgas = contract.constructor().estimateGas({
+            'from': account.address,
+            'nonce': w3.eth.getTransactionCount(account.address),
+            'gas': 2000000,
+            'gasPrice': gasPrice})
+        print(estgas)
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
-            'gas': 2000000,
-            'gasPrice': w3.toWei('30', 'gwei')})
+            'gas': estgas,
+            'gasPrice': gasPrice})
+
         # sign the transaction
         signed = account.signTransaction(construct_txn)
 
@@ -56,9 +68,10 @@ def build_and_deploy(account, w3):
     """ build and deploy contract """
     if w3.isConnected():
         contract = compile_contract()
+        print('Contract compiled')
         data = {
             'abi': contract['abi'],
-            'contract_address': deploy_contract(contract, account)
+            'contract_address': deploy_contract(contract, account, w3)
         }
         return data
     return False

@@ -2,19 +2,23 @@
 import json
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
-from ..constants import *
-from .utils import *
-from .grapQL import *
-from .eth_header_manipulation import BlockHeader
 
-def init_eth_with_pk(privatekey):
+from web3.gas_strategies.time_based import medium_gas_price_strategy
+
+from src.ethereum.utils import HexJsonEncoder
+from src.ethereum.grapQL import getBlockHeaders
+from src.ethereum.eth_header_manipulation import BlockHeader
+
+def init_eth_with_pk(privatekey, provider):
     """ Initialize blockchain connection """
-    web3 = Web3(Web3.HTTPProvider(ETHPROVIDER))
+    web3 = Web3(Web3.HTTPProvider(provider))
     # ONLY IN RINKEBY!!
-    # web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+    #web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
     acc = web3.eth.account.privateKeyToAccount(privatekey)
     web3.eth.default_account = acc.address
+    web3.eth.set_gas_price_strategy(medium_gas_price_strategy)
+    
     return web3
 
 def get_last_transaction(web3):
