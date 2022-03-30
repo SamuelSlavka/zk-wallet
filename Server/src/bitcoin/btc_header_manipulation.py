@@ -42,7 +42,16 @@ class BlockHeader:
 
     def zokratesBlockTarget(self):
         """ Returns expected target in zokratess expected form """
-        return " ".join(str(bin(getTarget(self.unhexBits)))[2:])
+        chunk_size = 16
+        target = getTarget(self.unhexBits)
+        # pad target to 64 and remove 0x
+        newTarget = f"{target:#0{66}x}"[2:]
+        # split traget to u64 values
+        splitHeader = [int((newTarget)[i:i+chunk_size], 16)
+                        for i in range(0, len(newTarget), chunk_size)]
+        splitHeaderStr = " ".join(str(x) for x in splitHeader)
+        print(splitHeaderStr)
+        return splitHeaderStr
 
     @property
     def header(self):
