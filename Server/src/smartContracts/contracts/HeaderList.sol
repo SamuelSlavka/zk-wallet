@@ -31,8 +31,8 @@ contract HeaderList{
     }
 
     function parseInput(uint[22] memory input) internal pure returns(Output memory) {
-        // last valuen in first header
-        uint256 prevHash = input[10];
+        // last values in first header
+        uint256 prevHash = input[11];
         uint256 lastHash = input[0];
         uint256 difficulty = input[1];
         uint256 number = input[2];

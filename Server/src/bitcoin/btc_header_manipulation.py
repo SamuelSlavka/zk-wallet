@@ -25,13 +25,13 @@ class BlockHeader:
         self.previous_block_hash = hexify(str("{:064d}".format(0)))
         if ('previousblockhash' in input):
             self.previous_block_hash = hexify(input['previousblockhash'])
-
+        
         self.version = hexify(input['versionHex'])
         self.merkle_root = hexify(input['merkleroot'])
         self.timestamp = hexify(format(input['time'], 'x'))
         self.bits = hexify(input['bits'])
-        self.nonce = hexify(format(input['nonce'], 'x'))
-
+        
+        self.nonce = hexify(format(input['nonce'], 'x').zfill(8))
     def __str__(self) -> str:
         return f'BlockHeader #{self.height} {self.hash}'
 
