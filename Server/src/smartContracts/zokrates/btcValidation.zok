@@ -83,14 +83,16 @@ def get_prev_hash(u32[8] hash) -> field:
     return u32Pack256(res)
 
 // takes in epoch and vaildates it
-def main(field[16][5] fieldHeader, u64[16][4] expectedTarget, field[16] currentHash, field previousHash) -> bool:
-    
-    for u32 i in 0..2 do
-        u32[4] header0 = unpack128(fieldHeader[i][0])
-        u32[4] header1 = unpack128(fieldHeader[i][1])
-        u32[4] header2 = unpack128(fieldHeader[i][2])
-        u32[4] header3 = unpack128(fieldHeader[i][3])
-        u32[4] header4 = unpack128(fieldHeader[i][4])
+def main(field[5] firstInputHeader, private field[31][5] inputHeaders, u64[4] firstInputExpectedTarget, private u64[31][4] inputExpectedTargets, private field[31] inputCurrentHashes, field inputLastCurrentHash, field previousHash) -> bool:
+    field[32][5] headers = [firstInputHeader, ...inputHeaders]
+    u64[32][4] expectedTarget = [firstInputExpectedTarget, ...inputExpectedTargets]
+    field[32] currentHashes = [...inputCurrentHashes, inputLastCurrentHash]
+    for u32 i in 0..32 do
+        u32[4] header0 = unpack128(headers[i][0])
+        u32[4] header1 = unpack128(headers[i][1])
+        u32[4] header2 = unpack128(headers[i][2])
+        u32[4] header3 = unpack128(headers[i][3])
+        u32[4] header4 = unpack128(headers[i][4])
 
         field currentHashFromHeader = hash_block_header([header0,header1,header2,header3,header4])
         field target = check_target(header4[2], expectedTarget[i])
@@ -98,7 +100,7 @@ def main(field[16][5] fieldHeader, u64[16][4] expectedTarget, field[16] currentH
         // hash needs to be under target
         assert(target > currentHashFromHeader)
         // hash needs to equal hash calculated in server
-        assert(currentHash[i] == currentHashFromHeader)
+        assert(currentHashes[i] == currentHashFromHeader)
         // previous hash field in header needs to equal previous hash
         assert(previousHash == previousHashFromHeader)
         // set previous hash to current hash

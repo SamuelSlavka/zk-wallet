@@ -12,9 +12,10 @@ if(sys.argv[1] == 'compile'):
         logging.info('Compilation succes')
 
 if(sys.argv[1] == 'witness'):
-    input = get_zk_input(1,17).strip('\"')
+    input = get_zk_input(1,33).strip('\"')
     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInput', 'w') as file:
         file.write(input)
+    logging.info('Input generated')
     if(compute_witness()):
         logging.info('Witness generated')
 
