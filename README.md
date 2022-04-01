@@ -19,12 +19,16 @@ Compilation is heavily dependant on number of headers in batches with proportion
 - 32 headers ~15GB ram local setup time: 40 minutes
 - 64 headers >30GB ram failed
 
-#### create witness for current smartContracts/zokrates/zokratesInput file
-    make witness
+#### create proof for current smartContracts/zokrates/zokratesInput file
+    make proof
 
 Witness generation:
-- 16 witenss ~5 gb ram time: 1:15
-- 32 witness ~12 gb ram time: 1:50
+- 16 headers ~5GB ram time: 1:15s
+- 32 headers ~7GB ram time: 2:40s
+
+Proof generation
+- 32 headers ~10GB ram time: 6:00s
+
 
 #### deploy current vesion of smart contract in smartContracts/build/contracts (created in make compile)
     make deploy 
