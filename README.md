@@ -24,7 +24,7 @@ Compilation is heavily dependant on number of headers in batches with proportion
 
 Witness generation:
 - 16 witenss ~5 gb ram time: 1:15
-- 32 witness ~7 gb ram time: 3:00
+- 32 witness ~12 gb ram time: 1:50
 
 #### deploy current vesion of smart contract in smartContracts/build/contracts (created in make compile)
     make deploy 
