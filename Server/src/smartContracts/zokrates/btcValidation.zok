@@ -83,10 +83,18 @@ def get_prev_hash(u32[8] hash) -> field:
     return u32Pack256(res)
 
 // takes in epoch and vaildates it
-def main(field[5] firstInputHeader, private field[31][5] inputHeaders, u64[4] firstInputExpectedTarget, private u64[31][4] inputExpectedTargets, private field[31] inputCurrentHashes, field inputLastCurrentHash, field previousHash) -> bool:
+def main( field[5] firstInputHeader,
+        private field[31][5] inputHeaders,
+        u64[4] firstInputExpectedTarget,
+        private u64[31][4] inputExpectedTargets,
+        private field[31] inputCurrentHashes,
+        field inputLastCurrentHash,
+        field previousHash) -> bool:
+
     field[32][5] headers = [firstInputHeader, ...inputHeaders]
     u64[32][4] expectedTarget = [firstInputExpectedTarget, ...inputExpectedTargets]
     field[32] currentHashes = [...inputCurrentHashes, inputLastCurrentHash]
+    
     for u32 i in 0..32 do
         u32[4] header0 = unpack128(headers[i][0])
         u32[4] header1 = unpack128(headers[i][1])

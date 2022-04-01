@@ -19,12 +19,12 @@ def compile_validator():
         # compile contract
         subprocess.run('zokrates compile -i btcValidation.zok', shell=True, cwd=working_directory)
         logging.info('Compilation finished')
-        # setup zksanrks
+        # setup zksanrks (!warning this produces toxic waste!)
         subprocess.run('zokrates setup', shell=True, cwd=working_directory)
         logging.info('Setup finished')
-        # create smart contract (!warning this produces toxic waste!)
+        # create smart contract 
         subprocess.run('zokrates export-verifier', shell=True, cwd=working_directory)
-        logging.info('verifier exported')
+        logging.info('Verifier exported')
         # update contract
         subprocess.run('cp verifier.sol ../contracts/verifier.sol', shell=True, cwd=working_directory)
         logging.info('Updated verifier')
@@ -34,8 +34,8 @@ def compile_validator():
         logging.error("Error '{0}' occurred.".format(err))
         return False
 
-def compute_witness():
-    """ compute witness """
+def compute_proof():
+    """ compute proof """
     working_directory =  os.getcwd() + '/Server/src/smartContracts/zokrates'
     try:
         init_zokrates(working_directory)
@@ -43,6 +43,9 @@ def compute_witness():
         with open(working_directory+'/zokratesInput', 'r') as file:
             data = file.read().rstrip()
             subprocess.run('zokrates compute-witness -a ' + data, shell=True, cwd=working_directory)
+            logging.info('Witness created')
+            subprocess.run('zokrates generate-proof', shell=True, cwd=working_directory)
+            logging.info('Proof created')
         return True
     except Exception as err:
         logging.error("Error '{0}' occurred.".format(err))
