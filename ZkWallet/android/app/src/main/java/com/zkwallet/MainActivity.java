@@ -35,12 +35,12 @@ public class MainActivity extends ReactActivity {
     Context ctx = new Context();
     try {
       NodeConfig nodeConfig = Geth.newNodeConfig();
-      // rinkeby
-      nodeConfig.setEthereumNetworkID(4);
-      String genesis = Geth.rinkebyGenesis();
+      // ropsten ID
+      nodeConfig.setEthereumNetworkID(3);
+      String genesis = Geth.ropstenGenesis();
       nodeConfig.setEthereumGenesis(genesis);
 
-      Node node = Geth.newNode(getFilesDir() + "/.rinkeby", nodeConfig);
+      Node node = Geth.newNode(getFilesDir() + "/.ropsten", nodeConfig);
 
       NodeHolder nh = NodeHolder.getInstance();
       node.start();

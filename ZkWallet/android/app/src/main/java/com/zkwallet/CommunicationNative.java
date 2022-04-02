@@ -27,6 +27,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     public CommunicationNative(ReactApplicationContext reactContext) {
         super(reactContext);
     }
+    public String keystoreLocation = "/ropsten-keystore";
 
     @Override
     public String getName() {
@@ -37,7 +38,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     public void getAddress(Callback cb) {
         try {
             NodeHolder nh = NodeHolder.getInstance();
-            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore2", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
             
             cb.invoke(acc.getAddress().getHex());
@@ -53,7 +54,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         // creates a new account and exports it
         try {
             NodeHolder nh = NodeHolder.getInstance();
-            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore2", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
 
             Account newAcc = ks.newAccount(creationPassword);
             nh.setAcc(newAcc);
@@ -74,7 +75,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         // imports account from json and two passwods
         try {
             NodeHolder nh = NodeHolder.getInstance();
-            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore2", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
 
             Account impAcc = ks.importKey(keyfile.getBytes(), exportPassword, importPassword);
             nh.setAcc(impAcc);
@@ -93,7 +94,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         try {
             NodeHolder nh = NodeHolder.getInstance(); 
             Node node = nh.getNode();
-            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore2", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
             EthereumClient ec = node.getEthereumClient();
             Context ctx = new Context();
@@ -133,7 +134,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             NodeHolder nh = NodeHolder.getInstance(); 
             Node node = nh.getNode();
             EthereumClient ec = node.getEthereumClient();
-            KeyStore ks = new KeyStore(nh.getFilesDir() + "/keystore2", Geth.LightScryptN, Geth.LightScryptP);
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
 
             long nonce = ec.getPendingNonceAt(ctx, acc.getAddress());
@@ -158,8 +159,6 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             ks.timedUnlock(acc, password, 10000000);
             transaction = ks.signTx(acc, transaction, new BigInt(4));
             ec.sendTransaction(ctx, transaction);
-    
-            //cb.invoke(balanceAt.string());
         } catch (Exception e) {
             cb.invoke("error", e.getMessage());
             android.util.Log.d("error", e.getMessage());
