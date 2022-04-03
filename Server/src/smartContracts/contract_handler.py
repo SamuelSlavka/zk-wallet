@@ -34,16 +34,21 @@ def deploy_contract(contractInterface, account, w3):
     try:
         contract = w3.eth.contract(
             abi=contractInterface['abi'],
-            bytecode=contractInterface['bytecode'])
+            bytecode=contractInterface['bytecode']
+        )
         
+        # get gas
         gasPrice = w3.eth.generate_gas_price()
-        logging.info(gasPrice)
+        logging.info('GasPrice: ' + str(gasPrice))
+        
+        # estimate gas
         estgas = contract.constructor().estimateGas({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
-            'gas': 2000000,
+            'gas': 20000000,
             'gasPrice': gasPrice})
-        logging.info(estgas)
+        logging.info('Estgas: '+ str(estgas))
+
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,
@@ -56,7 +61,7 @@ def deploy_contract(contractInterface, account, w3):
 
         # Get transaction hash from deployed contract
         tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
-
+        logging.info('Sent transaction')
         # Get tx receipt to get contract address
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         return tx_receipt['contractAddress']
@@ -68,10 +73,19 @@ def build_and_deploy(account, w3):
     """ build and deploy contract """
     if w3.isConnected():
         contract = compile_contract()
-        logging.info('Contract compiled')
         data = {
             'abi': contract['abi'],
             'contract_address': deploy_contract(contract, account, w3)
         }
         return data
+    return False
+
+def interact_with_contract(account, w3, contract_address, abi):
+    if w3.isConnected():
+        contract = w3.eth.contract(
+            address=contract_address,
+            abi=abi
+        )
+        result = contract.functions.helloWorld('Hello there!').call()
+        logging.info(result)
     return False

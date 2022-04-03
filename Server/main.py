@@ -1,9 +1,9 @@
-from src.smartContracts.contract_handler import build_and_deploy
+from src.smartContracts.contract_handler import build_and_deploy, interact_with_contract
 from src.smartContracts.zokrates_handler import compile_validator, compute_proof
 from src.ethereum.ethereum import init_eth_with_pk
 from src.bitcoin.bitcoin import get_zk_input
 from src.constants import *
-import sys, os, logging
+import sys, os, logging, json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,7 +21,17 @@ if(sys.argv[1] == 'proof'):
 if(sys.argv[1] == 'deploy'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
     acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
-    logging.info(acc.address)
     if(web3.isConnected()):
-        build_and_deploy(acc, web3)
-        logging.info('Contracts deployed')
+        result = build_and_deploy(acc, web3)
+        if(result):
+            with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'w') as file:
+                file.write(json.dumps(result))
+                logging.info('Contract at:'+result['contract_address'])
+
+if(sys.argv[1] == 'interact'):
+    web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
+    acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
+    if(web3.isConnected()):
+        with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
+            contract = json.load(file)
+            result = interact_with_contract(acc, web3, contract['contract_address'], contract['abi'])

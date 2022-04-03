@@ -20,10 +20,14 @@ start:
 compile:
 	python3 ./Server/main.py compile
 
-# create witness
-witness:
-	python3 ./Server/main.py witness
+# create proof
+proof:
+	python3 ./Server/main.py proof
 
 # deploy smart contracts
 deploy:
 	python3 ./Server/main.py deploy
+
+# interact with smart contract
+interact:
+	python3 ./Server/main.py interact
