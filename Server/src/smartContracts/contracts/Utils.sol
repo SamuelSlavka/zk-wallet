@@ -17,9 +17,8 @@ function createProof(Input memory input) pure returns(verifier.Verifier.Proof me
 // transforms input to structure
 function parseInput(uint256[12] memory input) pure returns(Output memory) {
     // last values in first header
-    uint256 prevHash = input[11];
-    uint256 lastHash = input[10];
-    uint256 difficulty = input[5]+input[6]+input[7]+input[8];
-    uint256 number = 0;
-    return Output(prevHash, lastHash, number, difficulty);
+    uint256 prevHash = input[10];
+    uint256 lastHash = input[9];
+    uint256 difficulty = 0x00000000FFFF0000000000000000000000000000000000000000000000000000 / (((((input[5] << 64) + input[6]) << 64) + input[7]) << 64) + input[8];
+    return Output(prevHash, lastHash, 0, difficulty);
 }

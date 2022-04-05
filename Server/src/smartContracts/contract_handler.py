@@ -1,12 +1,15 @@
 """ Smart contract creation and deployment interaction """
 # refs https://github.com/SamuelSlavka/slavkaone
 
-import json, subprocess, os, sys, logging
+from src.constants import *
+from src.ethereum.ethereum import init_eth_with_pk
+import json
+import subprocess
+import os
+import sys
+import logging
 
 sys.path.insert(0, os.getcwd()+'/Server/src/ethereum')
-
-from src.ethereum.ethereum import init_eth_with_pk
-from src.constants import *
 
 
 def compile_contract():
@@ -19,11 +22,12 @@ def compile_contract():
         # contract location
         working_directory = os.getcwd() + '/Server/src/smartContracts/'
         # compile contract
-        subprocess.run(('truffle compile'), cwd=working_directory + 'contracts/', shell=True)
+        subprocess.run(('truffle compile'),
+                       cwd=working_directory + 'contracts/', shell=True)
 
         with open(working_directory + 'build/contracts/HeaderList.json', "r") as file:
             contract = json.load(file)
-        return contract
+            return contract
     except Exception as err:
         logging.error("Error '{0}' occurred.".format(err))
         return {'error': err}
@@ -36,18 +40,18 @@ def deploy_contract(contractInterface, account, w3):
             abi=contractInterface['abi'],
             bytecode=contractInterface['bytecode']
         )
-        
+
         # get gas
         gasPrice = w3.eth.generate_gas_price()
         logging.info('GasPrice: ' + str(gasPrice))
-        
+
         # estimate gas
         estgas = contract.constructor().estimateGas({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
             'gas': 20000000,
             'gasPrice': gasPrice})
-        logging.info('Estgas: '+ str(estgas))
+        logging.info('Estgas: ' + str(estgas))
 
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
@@ -69,6 +73,7 @@ def deploy_contract(contractInterface, account, w3):
         logging.error("Error '{0}' occurred.".format(err))
         return {'error': err}
 
+
 def build_and_deploy(account, w3):
     """ build and deploy contract """
     if w3.isConnected():
@@ -80,12 +85,17 @@ def build_and_deploy(account, w3):
         return data
     return False
 
+
 def interact_with_contract(account, w3, contract_address, abi):
-    if w3.isConnected():
+    """ Send inputs to contract method """
+    if(w3.isConnected()):
         contract = w3.eth.contract(
             address=contract_address,
             abi=abi
         )
-        result = contract.functions.helloWorld('Hello there!').call()
-        logging.info(result)
+        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as file:
+            proof = json.load(file)
+            logging.info('Proof loaded')
+            result = contract.functions.submitBatches(proof).call({'from': account})
+            logging.info(result)
     return False

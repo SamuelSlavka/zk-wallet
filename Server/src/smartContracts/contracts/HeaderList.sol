@@ -5,11 +5,12 @@ pragma experimental ABIEncoderV2;
 import './verifier.sol' as verifier;
 import './Utils.sol' as utils;
 import './Structures.sol';
+import "hardhat/console.sol";
 
-contract HeaderList{    
+contract HeaderList{
     Chain headerChain;
     constructor() {
-        // init headerchain
+        // init headerchain with btc genesis
         headerChain.genesisHash = 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f;
         headerChain.mainFork = 0;
         headerChain.forkCount = 1;
@@ -41,24 +42,23 @@ contract HeaderList{
         }
         return 0;
     }
-
-    function helloWorld(string memory str) pure public returns (string memory) {
-        return str;
-    }
-
+    
     // call zokrates verifier
-    function submitBatches(Input[] memory inputs) public {
+    function submitBatches(Input[] memory inputs, uint256 startHeight, uint256 endHeight) public {
+        console.log("start");
         verifier.Verifier ver = new verifier.Verifier();
         Output memory firstInput = utils.parseInput(inputs[0].input);
-        Output memory lastInput = utils.parseInput(inputs[inputs.length].input);
+        Output memory lastInput = utils.parseInput(inputs[inputs.length-1].input);
         Output memory result;
         result.prevHash = firstInput.prevHash;
         result.totalDifficulty = firstInput.totalDifficulty * inputs.length;
         result.lastHash = lastInput.lastHash;
-        result.number = lastInput.number;
+        result.number = endHeight;
         
         // batch height
-        uint256 forkNumber = findFork(result.prevHash, result.number);
+        uint256 forkNumber = findFork(result.prevHash, startHeight-1);
+        console.log("fork: ", forkNumber);
+        
         // batch difficulty
         Fork storage fork = headerChain.forks[forkNumber];
         uint256 currentHash = fork.batches[fork.forkHeight].lastHeaderHash;
@@ -68,9 +68,9 @@ contract HeaderList{
             Input memory input = inputs[i];
             verifier.Verifier.Proof memory proof = utils.createProof(input);
             
-            Output memory output = utils.parseInput(input.input);
+            Output memory output = utils.parseInput(input.input); 
             // must have at least under maximum target refs https://en.bitcoin.it/wiki/Target         
-            require(output.lastHash > 0x00000000FFFF0000000000000000000000000000000000000000000000000000);
+            require(output.lastHash < 0x00000000FFFF0000000000000000000000000000000000000000000000000000);
             // verify batch correctness
             require(ver.verifyTx(proof, input.input));
             // verify that batches form chain
@@ -79,9 +79,12 @@ contract HeaderList{
         }
         
         // store all input batches as single cumulated batch
-        fork.batches[fork.forkHeight+1].lastHeaderHash = result.lastHash;
-        fork.batches[fork.forkHeight+1].height = result.number;
+        fork.forkHeight = result.number;
+        fork.batches[fork.forkHeight].lastHeaderHash = result.lastHash;
+        fork.batches[fork.forkHeight].height = result.number;
 
+        // todoooo
+        
         // set cumulative diff
         // if the batch is not first set it to its diff + previous batch diff
         if(fork.forkHeight > 1) {

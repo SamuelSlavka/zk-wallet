@@ -33,7 +33,8 @@ pragma experimental ABIEncoderV2;
         uint number;
         uint totalDifficulty;
     }
-
+    
+    // Proof memory proof, uint[12] memory input
     // verifier input
     struct Input {
         uint[2] a;

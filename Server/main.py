@@ -12,11 +12,19 @@ if(sys.argv[1] == 'compile'):
         logging.info('Compilation succes')
 
 if(sys.argv[1] == 'proof'):
-    input = get_zk_input(1,33).strip('\"')
-    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInput', 'w') as file:
-        file.write(input)
-    logging.info('Input generated')
-    compute_proof()
+    start = 1
+    end = 33
+    # input = get_zk_input(start,end).strip('\"')
+    # print(input)
+    # with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInput', 'w') as file:
+    #     file.write(input)
+    # logging.info('Input generated')
+    # # write proof to solidity input file
+    # if(compute_proof()):
+    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
+        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
+            data = json.load(input)
+            file.write(json.dumps([[*data['proof'].values(),data['inputs']]])+','+str(start)+','+str(end))
 
 if(sys.argv[1] == 'deploy'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
