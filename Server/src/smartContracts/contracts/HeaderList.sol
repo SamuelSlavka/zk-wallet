@@ -5,10 +5,10 @@ pragma experimental ABIEncoderV2;
 import './verifier.sol' as verifier;
 import './Utils.sol' as utils;
 import './Structures.sol';
-import "hardhat/console.sol";
 
 contract HeaderList{
     Chain headerChain;
+    /// @dev Create new blockchain.
     constructor() {
         // init headerchain with btc genesis
         headerChain.genesisHash = 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f;
@@ -22,9 +22,13 @@ contract HeaderList{
         headerChain.forks[0].batches[0].lastHeaderHash = headerChain.genesisHash;
     }
 
-    // return 0 fork if does not find anything aditional check is necessary
-    // otherwise returns fork number that contains at number last batch with ending hash of prevHash
+    /// @dev Find fork contining hash at number or create a new one.
+    /// @param prevHash Hash that we search for.
+    /// @param number Start height.
+    /// @return uint256 Fork Id.
     function findFork(uint256 prevHash, uint number) private returns(uint256) {
+        // return 0 fork if does not find anything aditional check is necessary
+        // otherwise returns fork number that contains at number last batch with ending hash of prevHash
         for(uint i=1; i < headerChain.forkCount; i++){
             // if some fork can accept the batch at head
             if( headerChain.forks[i].forkHeight == number && 
@@ -42,13 +46,17 @@ contract HeaderList{
         }
         return 0;
     }
-    
-    // call zokrates verifier
+
+    event Log(string message, uint256 someNum);
+
+    /// @dev Verifies array of batches and appedns them to storage.
+    /// @param inputs Array of inputs containing proof and zok argument.
+    /// @param startHeight Start height og batch.
+    /// @param endHeight End height of the batch.
     function submitBatches(Input[] memory inputs, uint256 startHeight, uint256 endHeight) public {
-        console.log("start");
         verifier.Verifier ver = new verifier.Verifier();
-        Output memory firstInput = utils.parseInput(inputs[0].input);
-        Output memory lastInput = utils.parseInput(inputs[inputs.length-1].input);
+        Output memory firstInput = utils.parseInput(inputs[0].inputs);
+        Output memory lastInput = utils.parseInput(inputs[inputs.length-1].inputs);
         Output memory result;
         result.prevHash = firstInput.prevHash;
         result.totalDifficulty = firstInput.totalDifficulty * inputs.length;
@@ -57,7 +65,6 @@ contract HeaderList{
         
         // batch height
         uint256 forkNumber = findFork(result.prevHash, startHeight-1);
-        console.log("fork: ", forkNumber);
         
         // batch difficulty
         Fork storage fork = headerChain.forks[forkNumber];
@@ -68,11 +75,11 @@ contract HeaderList{
             Input memory input = inputs[i];
             verifier.Verifier.Proof memory proof = utils.createProof(input);
             
-            Output memory output = utils.parseInput(input.input); 
+            Output memory output = utils.parseInput(input.inputs); 
             // must have at least under maximum target refs https://en.bitcoin.it/wiki/Target         
             require(output.lastHash < 0x00000000FFFF0000000000000000000000000000000000000000000000000000);
             // verify batch correctness
-            require(ver.verifyTx(proof, input.input));
+            require(ver.verifyTx(proof, input.inputs));
             // verify that batches form chain
             require(currentHash == output.prevHash);
             currentHash = output.lastHash;
@@ -82,30 +89,56 @@ contract HeaderList{
         fork.forkHeight = result.number;
         fork.batches[fork.forkHeight].lastHeaderHash = result.lastHash;
         fork.batches[fork.forkHeight].height = result.number;
-
-        // todoooo
         
         // set cumulative diff
-        // if the batch is not first set it to its diff + previous batch diff
+        // if the batch is not first, set it to its' diff + previous batch diff
         if(fork.forkHeight > 1) {
-            fork.batches[fork.forkHeight+1].cumulativeDifficulty = 
+            fork.batches[fork.forkHeight].cumulativeDifficulty = 
                 result.totalDifficulty 
-                + fork.batches[fork.forkHeight].cumulativeDifficulty;
+                + fork.batches[fork.forkHeight-1].cumulativeDifficulty;
         }
         // else if the batch is first and continues from another branch
         else if ( fork.previousHeight > 1) {
             Fork storage prevFork = headerChain.forks[fork.previousFork];
-            fork.batches[fork.forkHeight+1].cumulativeDifficulty = 
+            fork.batches[fork.forkHeight].cumulativeDifficulty = 
                 result.totalDifficulty 
-                + prevFork.batches[prevFork.forkHeight].cumulativeDifficulty;
+                + prevFork.batches[fork.previousHeight].cumulativeDifficulty;
         }
         
-        // update main fork
+        // update main fork if current has more difficulty
         if(headerChain.mainFork != forkNumber) {
             Fork storage mainFork = headerChain.forks[headerChain.mainFork];
             if(fork.batches[fork.forkHeight].cumulativeDifficulty > mainFork.batches[mainFork.forkHeight].cumulativeDifficulty) {
                 headerChain.mainFork = forkNumber;
-            }            
+            }
         }
+    }
+
+    event ClosestHash(uint256);
+
+    /// @dev Returns closest hash to given height.
+    /// @param height Requested block height in blockchain.
+    /// @param forkNumber Forknumber to search in initially should be 0.
+    /// @return uint256 - Closest block hash.
+    function getClosestHash(uint height, uint forkNumber) public returns (uint256) {
+        Fork storage mainFork = headerChain.forks[forkNumber];
+        if(height > mainFork.forkHeight) {
+            height = mainFork.forkHeight+1;
+        }
+
+        for( uint i = height; i>=0; i--){
+            // if reached some hash return it
+            if(mainFork.batches[i].lastHeaderHash != 0){
+                emit ClosestHash(mainFork.batches[i].lastHeaderHash);
+                return mainFork.batches[i].lastHeaderHash;
+            }
+            else if(i == mainFork.previousHeight){
+                // if reached previous fork continue searching in it
+                return getClosestHash(mainFork.previousHeight, mainFork.previousFork);
+            }
+        }
+        // not found
+        emit ClosestHash(0);
+        return 0;
     }
 }

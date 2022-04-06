@@ -31,3 +31,6 @@ deploy:
 # interact with smart contract
 interact:
 	python3 ./Server/main.py interact
+
+call:
+	python3 ./Server/main.py call

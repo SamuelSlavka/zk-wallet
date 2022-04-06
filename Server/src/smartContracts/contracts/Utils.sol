@@ -5,7 +5,9 @@ pragma experimental ABIEncoderV2;
 import './verifier.sol' as verifier;
 import './Structures.sol';
 
-// extract proof object from input
+/// @dev Extract proof object from input.
+/// @param input Input struct.
+/// @return Proof Proof object.
 function createProof(Input memory input) pure returns(verifier.Verifier.Proof memory) {
     return verifier.Verifier.Proof(
         verifier.Pairing.G1Point(input.a[0],input.a[1]),
@@ -14,7 +16,9 @@ function createProof(Input memory input) pure returns(verifier.Verifier.Proof me
     );
 }
 
-// transforms input to structure
+/// @dev transforms input to structure.
+/// @param input Input in array of nums.
+/// @return Output Output object.
 function parseInput(uint256[12] memory input) pure returns(Output memory) {
     // last values in first header
     uint256 prevHash = input[10];

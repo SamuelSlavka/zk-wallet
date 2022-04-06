@@ -86,16 +86,35 @@ def build_and_deploy(account, w3):
     return False
 
 
-def interact_with_contract(account, w3, contract_address, abi):
+def send_batches_to_contract(account, w3, contract_address, abi):
     """ Send inputs to contract method """
     if(w3.isConnected()):
         contract = w3.eth.contract(
             address=contract_address,
             abi=abi
         )
-        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as file:
-            proof = json.load(file)
+        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'r') as file:
+            input = json.load(file)
             logging.info('Proof loaded')
-            result = contract.functions.submitBatches(proof).call({'from': account})
-            logging.info(result)
+            try:
+                tx_hash = contract.functions.submitBatches(
+                    [input["proof"]], input["start"], input["end"]).transact()
+                tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+                logging.info(tx_receipt)
+            except Exception as err:
+                logging.error('Failed to submit batches')
+
+
+    return False
+
+
+def get_closest_hash(account, w3, contract_address, abi, height):
+    """ Calls contract method """
+    if(w3.isConnected()):
+        contract = w3.eth.contract(
+            address=contract_address,
+            abi=abi
+        )
+        result = contract.functions.getClosestHash(height,0).call()
+        logging.info(result)
     return False
