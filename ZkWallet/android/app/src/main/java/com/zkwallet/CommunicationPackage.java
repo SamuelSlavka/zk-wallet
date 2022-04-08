@@ -30,3 +30,4 @@ public class CommunicationPackage implements ReactPackage {
     return modules;
   }
 }
+

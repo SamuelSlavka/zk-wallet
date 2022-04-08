@@ -26,8 +26,10 @@ import org.ethereum.geth.NodeConfig;
 public class CommunicationNative extends ReactContextBaseJavaModule {
     public CommunicationNative(ReactApplicationContext reactContext) {
         super(reactContext);
+        
     }
-    public String keystoreLocation = "/ropsten-keystore";
+
+    public String keystoreLocation = "/rinkeby-keystore2";
 
     @Override
     public String getName() {
@@ -40,7 +42,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             NodeHolder nh = NodeHolder.getInstance();
             KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
-            
+
             cb.invoke(acc.getAddress().getHex());
         } catch (Exception e) {
             cb.invoke("error", e.getMessage());
@@ -92,33 +94,17 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     public void getBalance(Callback cb) {
         // callsContract with message
         try {
-            NodeHolder nh = NodeHolder.getInstance(); 
+            NodeHolder nh = NodeHolder.getInstance();
             Node node = nh.getNode();
             KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
-            EthereumClient ec = node.getEthereumClient();
+
+            EthereumClient ec = nh.getClient();
+            
             Context ctx = new Context();
             BigInt balanceAt = ec.getBalanceAt(ctx, acc.getAddress(), -1);
+            
             cb.invoke(balanceAt.string());
-        } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
-            android.util.Log.d("error", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @ReactMethod
-    public void callContract(Callback cb) {
-        // callsContract with message
-        try {
-            NodeHolder nh = NodeHolder.getInstance(); 
-            Node node = nh.getNode();
-            EthereumClient ec = node.getEthereumClient();
-            Context ctx = new Context();
-
-            CallMsg msg = Geth.newCallMsg();
-            byte[] result = ec.callContract(ctx, msg, -1);
-            cb.invoke(new String(result));
         } catch (Exception e) {
             cb.invoke("error", e.getMessage());
             android.util.Log.d("error", e.getMessage());
@@ -131,34 +117,91 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
         // sends transaction to receiver with value
         Context ctx = new Context();
         try {
-            NodeHolder nh = NodeHolder.getInstance(); 
-            Node node = nh.getNode();
-            EthereumClient ec = node.getEthereumClient();
+            NodeHolder nh = NodeHolder.getInstance();
+            EthereumClient ec = nh.getClient();
+
             KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
             Account acc = ks.getAccounts().get(0);
 
             long nonce = ec.getPendingNonceAt(ctx, acc.getAddress());
 
+            // create msg for determining price and limit
             CallMsg msg = Geth.newCallMsg();
             BigInt gasPrice = ec.suggestGasPrice(ctx);
-
             msg.setFrom(acc.getAddress());
             msg.setGas(200000);
-
-            
             msg.setGasPrice(gasPrice);
-
             msg.setValue(Geth.newBigInt(amount));
             msg.setData(data_string.getBytes());
             msg.setTo(Geth.newAddressFromHex(receiver));
-
             long gasLimit = ec.estimateGas(ctx, msg);
-            msg.setGas(gasLimit);
-
-            Transaction transaction = Geth.newTransaction(nonce, Geth.newAddressFromHex(receiver), Geth.newBigInt(amount), gasLimit, gasPrice, data_string.getBytes());
+            
+            // create transaction
+            Transaction transaction = Geth.newTransaction(nonce, Geth.newAddressFromHex(receiver),
+                    Geth.newBigInt(amount), gasLimit, gasPrice, data_string.getBytes());
             ks.timedUnlock(acc, password, 10000000);
+            // send transaction
             transaction = ks.signTx(acc, transaction, new BigInt(4));
             ec.sendTransaction(ctx, transaction);
+        } catch (Exception e) {
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @ReactMethod
+    public void getClosestHash(String password, String contractAddress, String abi, int target, Callback cb) {
+        // call contract at address wih target as param
+        Context ctx = new Context();
+        try {
+            NodeHolder nh = NodeHolder.getInstance();
+            EthereumClient ec = nh.getClient();
+            
+            KeyStore ks = new KeyStore(nh.getFilesDir() + keystoreLocation, Geth.LightScryptN, Geth.LightScryptP);
+            Account acc = ks.getAccounts().get(0);
+            BoundContract boundContract = Geth.bindContract(Geth.newAddressFromHex(contractAddress), abi, ec);
+
+            // configuring smart contract args
+            Interface value = Geth.newInterface();
+            Interface startFork = Geth.newInterface();
+            value.setBigInt(Geth.newBigInt(target));
+            startFork.setBigInt(Geth.newBigInt(0));
+            Interfaces params = Geth.newInterfaces(2);
+            params.set(0, value);
+            params.set(1, startFork);
+
+            // configuring return
+            Interface result = Geth.newInterface();
+            result.setDefaultBigInt();
+            Interfaces results = Geth.newInterfaces(1);
+            results.set(0, result);
+
+            CallOpts opts = Geth.newCallOpts();
+            opts.setContext(ctx);
+
+            android.util.Log.d("3 ", contractAddress);
+
+            boundContract.call(opts, results, "getClosestHash", params);
+            android.util.Log.d("4 ", "contractAddress");
+            cb.invoke("callResult: ", result);
+        } catch (Exception e) {
+            cb.invoke("error", e.getMessage());
+            android.util.Log.d("error", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @ReactMethod
+    public void getSyncProgress(Callback cb) {
+        try {
+            Context ctx = new Context();
+            NodeHolder nh = NodeHolder.getInstance();
+            SyncProgress sp = nh.getNode().getEthereumClient().syncProgress(ctx);
+            if (sp != null) {
+                cb.invoke("currentBlock: ", sp.getCurrentBlock());
+                return;
+            }
         } catch (Exception e) {
             cb.invoke("error", e.getMessage());
             android.util.Log.d("error", e.getMessage());

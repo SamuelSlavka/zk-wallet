@@ -13,7 +13,7 @@ def init_eth_with_pk(privatekey, provider):
     """ Initialize blockchain connection """
     web3 = Web3(Web3.HTTPProvider(provider))
     # ONLY IN RINKEBY!!
-    #web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+    web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
     acc = web3.eth.account.privateKeyToAccount(privatekey)
     web3.eth.default_account = acc.address

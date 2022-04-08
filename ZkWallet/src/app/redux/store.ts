@@ -8,7 +8,7 @@ import ethereumReducer from './reducers';
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['keyfile'],
+  whitelist: ['keyfile', 'contract'],
 };
 
 const rootReducer = combineReducers({

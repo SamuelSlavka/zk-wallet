@@ -3,6 +3,32 @@ import {NativeModules} from 'react-native';
 
 import {BASE_URL} from '../config';
 
+export const getClosestHash = (
+  password: string,
+  contractAddress: string,
+  abi: string,
+  target: number,
+) => {
+  console.log(password);
+  console.log(contractAddress);
+  console.log(abi);
+  console.log(target);
+  return async (dispatch: any) => {
+    NativeModules.CommunicationNative.getClosestHash(
+      password,
+      contractAddress,
+      abi,
+      target,
+      (str: any) => {
+        dispatch({
+          type: GET_CLOSEST_HASH,
+          payload: str,
+        });
+      },
+    );
+  };
+};
+
 export const getBalance = () => {
   return async (dispatch: any) => {
     NativeModules.CommunicationNative.getBalance((str: any) => {
@@ -80,8 +106,30 @@ export const getZkInput = () => {
   };
 };
 
+export const getInfo = () => {
+  return async (dispatch: any) => {
+    axios
+      .get(`${BASE_URL}/api/contract`)
+      .then(function (response) {
+        if (response.data) {
+          dispatch({
+            type: GET_CONTRACT_INFO,
+            payload: response.data,
+          });
+        } else {
+          console.log('Unable to fetch data from the API BASE URL!');
+        }
+      })
+      .catch(function (error: any) {
+        console.warn(error);
+      });
+  };
+};
+
 export const GET_ETH_ZKINPUT = 'GET_ETH_ZKINPUT';
 export const GET_ETH_BALANCE = 'GET_ETH_BALANCE';
 export const NEW_ETH_ACCOUNT = 'NEW_ETH_ACCOUNT';
 export const LOAD_ETH_ACCOUNT = 'LOAD_ETH_ACCOUNT';
 export const GET_ETH_ADDRESS = 'GET_ETH_ADDRESS';
+export const GET_CONTRACT_INFO = 'GET_CONTRACT_INFO';
+export const GET_CLOSEST_HASH = 'GET_CLOSEST_HASH';

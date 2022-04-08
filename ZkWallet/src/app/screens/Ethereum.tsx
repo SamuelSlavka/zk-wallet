@@ -5,19 +5,23 @@ import {
   loadAccount,
   newAccount,
   getAddress,
+  getInfo,
+  getClosestHash,
 } from '../redux/actions';
 import {RootState} from '../redux/store';
 
 import {NativeModules, Button, Alert, Text, SafeAreaView} from 'react-native';
 
 const Ethereum = () => {
-  const {ethBalance, keyfile, ethAddress} = useSelector(
+  const {ethBalance, keyfile, ethAddress, contract, closestHash} = useSelector(
     (state: RootState) => state.ethereumReducer,
   );
   const dispatch = useDispatch();
 
   const getEthBalance = () => dispatch(getBalance());
   const getEthAddress = () => dispatch(getAddress());
+  const getContractInfo = () => dispatch(getInfo());
+
   const newEthAccount = (password: string, exportPassword: string) =>
     dispatch(newAccount(password, exportPassword));
   const loadEthAccount = (
@@ -26,14 +30,24 @@ const Ethereum = () => {
     exportPassword: string,
   ) => dispatch(loadAccount(setupResult, password, exportPassword));
 
+  const getHash = (password: string, height: number) =>
+    dispatch(
+      getClosestHash(
+        password,
+        contract.contract_address,
+        JSON.stringify(contract.abi),
+        height,
+      ),
+    );
+
   useEffect(() => {
-    console.log(keyfile);
     // create new account if empty or broken
     if (keyfile === '' || keyfile === 'error') {
       newEthAccount('password', 'exportPassword');
     }
     getEthBalance();
     getEthAddress();
+    getContractInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,11 +55,14 @@ const Ethereum = () => {
     <SafeAreaView>
       <Text>{ethAddress}</Text>
       <Text>{ethBalance}</Text>
+      <Text>{contract.contract_address}</Text>
+      <Text>{closestHash}</Text>
       <Button
         title="refresh"
         onPress={() => {
           getEthBalance();
           getEthAddress();
+          getContractInfo();
         }}
       />
       <Button
@@ -61,11 +78,9 @@ const Ethereum = () => {
         }}
       />
       <Button
-        title="call contract"
+        title="get Closest Hash"
         onPress={() => {
-          NativeModules.CommunicationNative.callContract((str: any) => {
-            Alert.alert(str);
-          });
+          getHash('password', 40);
         }}
       />
       <Button

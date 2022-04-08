@@ -1,6 +1,6 @@
 from flask import Flask
 
-from src.ethereum import get_last_transaction, init_eth_with_pk
+from src.ethereum import get_last_transaction, init_eth_with_pk, get_contract_info
 from src.bitcoin import get_zk_input
 from src.constants import *
 
@@ -16,6 +16,11 @@ def home():
     if(web3.isConnected()):
         return 'Hello there!'
     return 'Connection error'        
+
+@app.route('/api/contract/')
+def getContractInfo():
+    """ Deployed contract information """
+    return get_contract_info(), 200
 
 @app.route('/eth/')
 def lastTransaction():
