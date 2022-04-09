@@ -97,11 +97,18 @@ def send_batches_to_contract(account, w3, contract_address, abi):
             input = json.load(file)
             logging.info('Proof loaded')
             try:
-                tx_hash = contract.functions.submitBatches(
-                    [input["proof"]], input["start"], input["end"]).transact()
+                nonce = w3.eth.getTransactionCount(account.address)
+                transaction = contract.functions.submitBatches(
+                    [input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
+                logging.info('nonce')
+                signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
+                logging.info('Transaction created')
+                tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
+                logging.info('Transaction sent')
                 tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
                 logging.info(tx_receipt)
             except Exception as err:
+                logging.error(err)
                 logging.error('Failed to submit batches')
 
 

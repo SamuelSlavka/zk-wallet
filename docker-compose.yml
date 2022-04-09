@@ -83,7 +83,7 @@ services:
         # Enable metrics collection and reporting
         "--metrics",
         # Ethereum network
-        #"--rinkeby",
+        "--ropsten",
         # Maximum number of network peers (network disabled if set to 0) (default: 50)
         "--maxpeers=50",
         # Data directory for the databases and keystore (default: "/root/.ethereum")

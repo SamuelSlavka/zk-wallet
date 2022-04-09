@@ -26,10 +26,9 @@ import org.ethereum.geth.NodeConfig;
 public class CommunicationNative extends ReactContextBaseJavaModule {
     public CommunicationNative(ReactApplicationContext reactContext) {
         super(reactContext);
-        
     }
 
-    public String keystoreLocation = "/rinkeby-keystore2";
+    public String keystoreLocation = "/ropsten";
 
     @Override
     public String getName() {
@@ -45,7 +44,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
 
             cb.invoke(acc.getAddress().getHex());
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
@@ -63,10 +62,9 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             ks.getAccounts().set(0, newAcc);
             byte[] jsonAcc = ks.exportKey(newAcc, creationPassword, exportPassword);
 
-            android.util.Log.d("ers: ", new String(jsonAcc));
             cb.invoke(new String(jsonAcc));
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
@@ -84,7 +82,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             byte[] jsonAcc = ks.exportKey(impAcc, importPassword, exportPassword);
             cb.invoke(new String(jsonAcc));
         } catch (Exception e) {
-            cb.invoke(e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
@@ -106,14 +104,14 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             
             cb.invoke(balanceAt.string());
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
     }
 
     @ReactMethod
-    public void sendTransaction(String password, String receiver, int amount, String data_string, Callback cb) {
+    public void sendTransaction(String password, String receiver, int amount, Callback cb) {
         // sends transaction to receiver with value
         Context ctx = new Context();
         try {
@@ -132,19 +130,20 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             msg.setGas(200000);
             msg.setGasPrice(gasPrice);
             msg.setValue(Geth.newBigInt(amount));
-            msg.setData(data_string.getBytes());
             msg.setTo(Geth.newAddressFromHex(receiver));
             long gasLimit = ec.estimateGas(ctx, msg);
             
             // create transaction
             Transaction transaction = Geth.newTransaction(nonce, Geth.newAddressFromHex(receiver),
-                    Geth.newBigInt(amount), gasLimit, gasPrice, data_string.getBytes());
+                    Geth.newBigInt(amount), gasLimit, gasPrice, "".getBytes());
+            // unlock account for set time
             ks.timedUnlock(acc, password, 10000000);
             // send transaction
             transaction = ks.signTx(acc, transaction, new BigInt(4));
             ec.sendTransaction(ctx, transaction);
+            cb.invoke("sent");
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
@@ -177,16 +176,15 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             Interfaces results = Geth.newInterfaces(1);
             results.set(0, result);
 
+            // configure options
             CallOpts opts = Geth.newCallOpts();
             opts.setContext(ctx);
 
-            android.util.Log.d("3 ", contractAddress);
-
             boundContract.call(opts, results, "getClosestHash", params);
-            android.util.Log.d("4 ", "contractAddress");
-            cb.invoke("callResult: ", result);
+            // return result in callback
+            cb.invoke(results.get(0).getBigInt().string());
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }
@@ -199,11 +197,11 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             NodeHolder nh = NodeHolder.getInstance();
             SyncProgress sp = nh.getNode().getEthereumClient().syncProgress(ctx);
             if (sp != null) {
-                cb.invoke("currentBlock: ", sp.getCurrentBlock());
+                cb.invoke(sp.getCurrentBlock());
                 return;
             }
         } catch (Exception e) {
-            cb.invoke("error", e.getMessage());
+            cb.invoke("error");
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }

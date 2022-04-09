@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   getBalance,
-  loadAccount,
   newAccount,
   getAddress,
   getInfo,
@@ -18,17 +17,14 @@ const Ethereum = () => {
   );
   const dispatch = useDispatch();
 
-  const getEthBalance = () => dispatch(getBalance());
-  const getEthAddress = () => dispatch(getAddress());
-  const getContractInfo = () => dispatch(getInfo());
+  const refreshData = () => {
+    dispatch(getBalance());
+    dispatch(getAddress());
+    dispatch(getInfo());
+  };
 
   const newEthAccount = (password: string, exportPassword: string) =>
     dispatch(newAccount(password, exportPassword));
-  const loadEthAccount = (
-    setupResult: string,
-    password: string,
-    exportPassword: string,
-  ) => dispatch(loadAccount(setupResult, password, exportPassword));
 
   const getHash = (password: string, height: number) =>
     dispatch(
@@ -45,9 +41,7 @@ const Ethereum = () => {
     if (keyfile === '' || keyfile === 'error') {
       newEthAccount('password', 'exportPassword');
     }
-    getEthBalance();
-    getEthAddress();
-    getContractInfo();
+    refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -60,21 +54,13 @@ const Ethereum = () => {
       <Button
         title="refresh"
         onPress={() => {
-          getEthBalance();
-          getEthAddress();
-          getContractInfo();
+          refreshData();
         }}
       />
       <Button
         title="setup account"
         onPress={() => {
           newEthAccount('password', 'exportPassword');
-        }}
-      />
-      <Button
-        title="load account"
-        onPress={() => {
-          loadEthAccount(keyfile, 'password', 'exportPassword');
         }}
       />
       <Button
@@ -91,7 +77,6 @@ const Ethereum = () => {
             'password',
             '0xa7e4ef0a9e15bdef215e2ed87ae050f974ecd60b',
             0.0001,
-            'data',
             (str: any) => {
               Alert.alert(str);
             },
