@@ -12,6 +12,7 @@ ETHPROVIDER='https://ethshared.bdnodes.net?auth='+ETHTOKEN
 ETHGRAPH='https://ethshared.bdnodes.net/graphql'
 
 #BTC
+BTCTOKEN='REPLACEME'
 BTCPROVIDER='https://btccore-main.bdnodes.net'
 
 #ZEC

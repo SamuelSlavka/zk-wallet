@@ -3,16 +3,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {persistStore, persistReducer} from 'redux-persist';
 import thunk from 'redux-thunk';
 
-import ethereumReducer from './reducers';
+import ethReducer from './ethReducer';
+import btcReducer from './btcReducer';
 
-const persistConfig = {
+const persistEthConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['keyfile', 'contract'],
+  whitelist: ['keyfile', 'contract', 'closestHash'],
+};
+
+const persistBtcConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  whitelist: ['btcHeaders', 'btcCreadentails'],
 };
 
 const rootReducer = combineReducers({
-  ethereumReducer: persistReducer(persistConfig, ethereumReducer),
+  ethereumReducer: persistReducer(persistEthConfig, ethReducer),
+  bitcoinReducer: persistReducer(persistBtcConfig, btcReducer),
 });
 
 export const store = createStore(rootReducer, applyMiddleware(thunk));

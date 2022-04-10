@@ -9,7 +9,7 @@ import sys
 
 headers = {
     'Content-Type': 'application/json',
-    "X-Auth-Token": "ZlwlTalKafZepsGxV1-mes2kvwUq5WNNxooVxcNpTAA"
+    "X-Auth-Token": BTCTOKEN,
 }
 
 def getPayload(id, params, function):

@@ -4,15 +4,14 @@ import {
   getBalance,
   newAccount,
   getAddress,
-  getInfo,
-  getClosestHash,
-} from '../redux/actions';
-import {RootState} from '../redux/store';
+  sendTransaction,
+} from '../redux/ethActions';
 
-import {NativeModules, Button, Alert, Text, SafeAreaView} from 'react-native';
+import {RootState} from '../redux/store';
+import {Button, Text, SafeAreaView} from 'react-native';
 
 const Ethereum = () => {
-  const {ethBalance, keyfile, ethAddress, contract, closestHash} = useSelector(
+  const {ethBalance, keyfile, ethAddress} = useSelector(
     (state: RootState) => state.ethereumReducer,
   );
   const dispatch = useDispatch();
@@ -20,21 +19,20 @@ const Ethereum = () => {
   const refreshData = () => {
     dispatch(getBalance());
     dispatch(getAddress());
-    dispatch(getInfo());
+  };
+
+  const sendEthTransaction = () => {
+    dispatch(
+      sendTransaction(
+        'password',
+        '0x07A65AF32e0a4D5Fb2A074b050133971c937fFC0',
+        0.001,
+      ),
+    );
   };
 
   const newEthAccount = (password: string, exportPassword: string) =>
     dispatch(newAccount(password, exportPassword));
-
-  const getHash = (password: string, height: number) =>
-    dispatch(
-      getClosestHash(
-        password,
-        contract.contract_address,
-        JSON.stringify(contract.abi),
-        height,
-      ),
-    );
 
   useEffect(() => {
     // create new account if empty or broken
@@ -47,10 +45,10 @@ const Ethereum = () => {
 
   return (
     <SafeAreaView>
+      <Text>Your address</Text>
       <Text>{ethAddress}</Text>
+      <Text>Your balance</Text>
       <Text>{ethBalance}</Text>
-      <Text>{contract.contract_address}</Text>
-      <Text>{closestHash}</Text>
       <Button
         title="refresh"
         onPress={() => {
@@ -64,23 +62,9 @@ const Ethereum = () => {
         }}
       />
       <Button
-        title="get Closest Hash"
-        onPress={() => {
-          getHash('password', 40);
-        }}
-      />
-      <Button
         title="send transaction"
         onPress={() => {
-          // String password, String receiver, int amount, String jsonTransaction, String data_string
-          NativeModules.CommunicationNative.sendTransaction(
-            'password',
-            '0xa7e4ef0a9e15bdef215e2ed87ae050f974ecd60b',
-            0.0001,
-            (str: any) => {
-              Alert.alert(str);
-            },
-          );
+          sendEthTransaction();
         }}
       />
     </SafeAreaView>

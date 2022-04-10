@@ -17,7 +17,6 @@ if(sys.argv[1] == 'proof'):
     start = 1
     end = 33
     input = get_zk_input(start,end).strip('\"')
-    print(input)
     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInput', 'w') as file:
         file.write(input)
     logging.info('Input generated')

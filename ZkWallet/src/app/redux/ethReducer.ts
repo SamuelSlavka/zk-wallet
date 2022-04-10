@@ -7,7 +7,7 @@ import {
   GET_CONTRACT_INFO,
   GET_CLOSEST_HASH,
   TRANSACTION_SENT,
-} from './actions';
+} from './ethActions';
 
 const initialState = {
   input: '' as string,
@@ -19,7 +19,7 @@ const initialState = {
   contract: {contract_address: '' as string, abi: '' as string},
 };
 
-function ethereumReducer(state = initialState, action: any) {
+function ethReducer(state = initialState, action: any) {
   switch (action.type) {
     case GET_ETH_ZKINPUT:
       return {...state, input: action.payload};
@@ -46,4 +46,4 @@ function ethereumReducer(state = initialState, action: any) {
   }
 }
 
-export default ethereumReducer;
+export default ethReducer;
