@@ -8,7 +8,7 @@ import {
 } from '../redux/ethActions';
 
 import {RootState} from '../redux/store';
-import {Button, Text, SafeAreaView} from 'react-native';
+import {Button, Text, SafeAreaView, StyleSheet} from 'react-native';
 
 const Ethereum = () => {
   const {ethBalance, keyfile, ethAddress} = useSelector(
@@ -45,9 +45,9 @@ const Ethereum = () => {
 
   return (
     <SafeAreaView>
-      <Text>Your address</Text>
+      <Text style={styles.header}>Your address:</Text>
       <Text>{ethAddress}</Text>
-      <Text>Your balance</Text>
+      <Text style={styles.header}>Your balance:</Text>
       <Text>{ethBalance}</Text>
       <Button
         title="refresh"
@@ -70,5 +70,12 @@ const Ethereum = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});
 
 export default Ethereum;

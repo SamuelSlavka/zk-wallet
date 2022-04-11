@@ -45,3 +45,14 @@ export class Payload {
     this.params = params;
   }
 }
+
+export class BtcTransaction {
+  tx_hash: string;
+  value: number;
+  block_height: number;
+  constructor(tx_hash: string, value: number, block_height: number) {
+    this.tx_hash = tx_hash;
+    this.value = value;
+    this.block_height = block_height;
+  }
+}

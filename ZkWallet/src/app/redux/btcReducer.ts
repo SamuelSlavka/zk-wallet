@@ -1,15 +1,22 @@
 /* eslint-disable prettier/prettier */
-import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS } from './btcActions';
+import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS, GET_BTC_TRANSACTIONS } from './btcActions';
 import './btcModels';
-import { BtcHeader } from './btcModels';
+import { BtcHeader, BtcTransaction } from './btcModels';
 
 const initialState = {
     btcHeaders: [] as BtcHeader[],
-    btcCreadentails: {address: '' as string, pk: '' as string},
+    btcTransactions: [] as BtcTransaction[],
+    btcCreadentails: { address: '' as string, pk: '' as string },
 };
 
 function btcReducer(state = initialState, action: any) {
     switch (action.type) {
+        case GET_BTC_TRANSACTIONS:
+            const transactions = action.payload.txs.map(
+                function (transaction: any) {
+                    return new BtcTransaction(transaction.hash, transaction.result, transaction.block_height);
+                });
+            return { ...state, btcTransactions: transactions };
         case SET_BTC_CREDENTIALS:
             return { ...state, btcCreadentails: action.payload };
         case GET_BTC_HEADERS:

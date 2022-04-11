@@ -18,15 +18,17 @@ export const setCredentials = (address: string, pk: string) => {
     };
 
 export const getBalanceSummary = (address: string)  => {
-    return async () => {
+    return async (dispatch: any) => {
         axios({
             method: 'get',
-            url: BTC_API_URL + '/unspent?active=' + address,
+            url: BTC_API_URL + '/rawaddr/' + address,
             headers: headers,
         })
         .then(response => {
-            // return response.data;
-            console.log(response.data.unspent_outputs);
+            dispatch({
+                type: GET_BTC_TRANSACTIONS,
+                payload: response.data,
+            });
         })
         .catch(error => {
             console.log(error);
@@ -78,6 +80,7 @@ export const getBtcHeaders = (begining: number, end: number) => {
     };
 };
 
+export const GET_BTC_TRANSACTIONS = 'GET_BTC_TRANSACTIONS';
 export const GET_BTC_HEADERS = 'GET_BTC_HEADERS';
 export const SET_BTC_CREDENTIALS = 'SET_BTC_CREDENTIALS';
 
