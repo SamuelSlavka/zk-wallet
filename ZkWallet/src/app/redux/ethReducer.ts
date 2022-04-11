@@ -35,7 +35,6 @@ function ethReducer(state = initialState, action: any) {
       }
       return {...state, keyfile: action.payload};
     case GET_ETH_ADDRESS:
-      console.log(action.payload);
       return {...state, ethAddress: action.payload};
     case GET_CLOSEST_HASH:
       return {...state, closestHash: action.payload};

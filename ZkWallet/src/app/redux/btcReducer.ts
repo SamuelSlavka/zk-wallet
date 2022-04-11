@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { GET_BTC_HEADERS } from './btcActions';
+import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS } from './btcActions';
 import './btcModels';
 import { BtcHeader } from './btcModels';
 
@@ -10,6 +10,8 @@ const initialState = {
 
 function btcReducer(state = initialState, action: any) {
     switch (action.type) {
+        case SET_BTC_CREDENTIALS:
+            return { ...state, btcCreadentails: action.payload };
         case GET_BTC_HEADERS:
             const newHeaders: BtcHeader[] = [];
             action.payload.forEach((header: any) => {

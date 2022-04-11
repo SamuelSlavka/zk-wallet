@@ -1,24 +1,38 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
 import { Payload } from './btcModels';
-import { BTC_URL, BTC_TOKEN } from '../config';
+import { BTC_URL, BTC_TOKEN, BTC_API_URL } from '../config';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'X-Auth-Token': BTC_TOKEN,
-}
+};
 
-export const getHeaderByHash = async (hash: number): Promise<any>  => {
-    const promise = axios({
-        method: 'post',
-        url: BTC_URL,
-        headers: headers,
-        data: new Payload(0, [hash], 'getblock'),
-    });
+export const setCredentials = (address: string, pk: string) => {
+    return async (dispatch: any) => {
+        dispatch({
+            type: SET_BTC_CREDENTIALS,
+            payload: {address, pk},
+        });
+    };
+    };
 
-    const res = promise.then((response) => response.data);
-    return res;
-}
+export const getBalanceSummary = (address: string)  => {
+    return async () => {
+        axios({
+            method: 'get',
+            url: BTC_API_URL + '/unspent?active=' + address,
+            headers: headers,
+        })
+        .then(response => {
+            // return response.data;
+            console.log(response.data.unspent_outputs);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    };
+};
 
 // finds set of headers by theirs height
 export const getBtcHeaders = (begining: number, end: number) => {
@@ -65,3 +79,5 @@ export const getBtcHeaders = (begining: number, end: number) => {
 };
 
 export const GET_BTC_HEADERS = 'GET_BTC_HEADERS';
+export const SET_BTC_CREDENTIALS = 'SET_BTC_CREDENTIALS';
+
