@@ -102,7 +102,7 @@ def send_batches_to_contract(blockchainId, account, w3, contract_address, abi):
             try:
                 nonce = w3.eth.getTransactionCount(account.address)
                 transaction = contract.functions.submitBatches(
-                    [blockchainId, input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
+                    blockchainId, [input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
                 logging.info('nonce')
                 signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
                 logging.info('Transaction created')
@@ -125,6 +125,6 @@ def get_closest_hash(account, w3, contract_address, abi, height):
             address=contract_address,
             abi=abi
         )
-        result = contract.functions.getClosestHash(0, height, 2).call()
+        result = contract.functions.getClosestHash(0, height, 0).call()
         logging.info(result)
     return False

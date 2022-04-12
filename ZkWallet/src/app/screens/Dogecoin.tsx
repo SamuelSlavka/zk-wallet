@@ -9,19 +9,25 @@ import {
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
-
-import {getBtcHeaders, getBalanceSummary} from '../redux/dogeActions';
-import {getClosestHash, getInfo} from '../redux/ethActions';
+import {
+  getBtcHeaders,
+  getBalanceSummary,
+  getClosestHash,
+} from '../redux/dogeActions';
+import {getInfo} from '../redux/ethActions';
 import {BtcTransaction} from '../redux/btcModels';
 
 const address = 'DJVuMyGR4pxiQn8o6nqAX8D4yZaF9BkBmz';
 
 const Dogecoin = () => {
-  const {dogeHeaders, dogeCreadentails, dogeTransactions, dogeBalance} =
-    useSelector((state: RootState) => state.dogecoinReducer);
-  const {closestHash, contract} = useSelector(
-    (state: RootState) => state.ethereumReducer,
-  );
+  const {
+    dogeHeaders,
+    dogeCreadentails,
+    dogeTransactions,
+    dogeBalance,
+    dogeClosestHash,
+  } = useSelector((state: RootState) => state.dogecoinReducer);
+  const {contract} = useSelector((state: RootState) => state.ethereumReducer);
 
   const dispatch = useDispatch();
 
@@ -66,7 +72,7 @@ const Dogecoin = () => {
         <Text style={styles.header}>Last stored header:</Text>
         <Text>{dogeHeaders?.[dogeHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
-        <Text>{closestHash}</Text>
+        <Text>{dogeClosestHash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>
@@ -80,7 +86,9 @@ const Dogecoin = () => {
           onPress={() => {
             getHash(
               'password',
-              parseInt(dogeHeaders?.[dogeHeaders.length - 1]?.height, 10),
+              50,
+              // todo
+              // parseInt(dogeHeaders?.[dogeHeaders.length - 1]?.height, 10),
             );
           }}
         />

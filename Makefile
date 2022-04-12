@@ -16,18 +16,26 @@ dev:
 compile:
 	python3 ./Server/main.py compile
 
-# create proof
-proof:
-	python3 ./Server/main.py proof
+# create doge proof
+dogeproof:
+	python3 ./Server/main.py dogeproof
+
+# create btc proof
+btcproof:
+	python3 ./Server/main.py btcproof
+
+# interact with smart contract
+btcinteract:
+	python3 ./Server/main.py btcinteract
+
+# interact with smart contract
+dogeinteract:
+	python3 ./Server/main.py dogeinteract
 
 # deploy smart contracts
 deploy:
 	python3 ./Server/main.py deploy
 
-# interact with smart contract
-interact:
-	python3 ./Server/main.py interact
-
-# call contract method
+# call contract method default btc
 call:
 	python3 ./Server/main.py call

@@ -6,48 +6,11 @@ import "utils/pack/u32/pack256.zok" as u32Pack256
 import "utils/pack/u32/unpack128.zok" as unpack128
 
 import "utils/casts/u32_from_bits.zok" as u32_from_bits
+import "utils/casts/u64_from_bits.zok" as u64_from_bits
 import "utils/casts/u32_to_bits.zok" as u32_to_bits
 import "utils/casts/u64_to_bits.zok" as u64_to_bits
-
-// gets target exponent as input and checks if blocks head has number of zeros in binary target
-// as the header bits tail side only shifts head side by 2^(8*head-3)
-def check_exponent(bool[224] input, u32 expected) -> u32[2]:
-    u32 count = 0
-    u32 stop = 1
-    for u32 i in 0..223 do
-        stop = (input[223-i] == false) ? stop : 0 
-        count = count + stop
-    endfor
-    expected = 8*(expected - 3)
-    return [count,expected]
-
-// checks if target exponent has on the left side the tail from header
-def check_multiplier(bool[224] input, u32 expected, u32 exponent) -> u32[2]:
-    bool[32] res = [false; 32]
-    for u32 i in 0..223 do
-        res[i%32] = (i > (224-exponent)) ? res[i%32] : input[i]
-    endfor
-    u32 mul = u32_from_bits(res)
-    mul = mul >> 16
-    return [mul,expected]
-
-// target calculation is based on the folloing equation: tail * 2^(8*(head - 3))
-// retreives target from header and checks if input target was created by it
-def check_target(u32 bits, u64[4] expectedTarget) -> field:
-    bool[224] boolExpectedTarget = [...u64_to_bits(expectedTarget[0])[32..64], ...u64_to_bits(expectedTarget[1]), ...u64_to_bits(expectedTarget[2]), ...u64_to_bits(expectedTarget[3])]
-    bool[32] boolBits = u32_to_bits(bits)
-
-    bool[32] head = [...[false;24],...boolBits[24..32]]
-    bool[32] tail = [...[false;8],...boolBits[16..24],...boolBits[8..16],...boolBits[0..8]]
-    u32 inthead = u32_from_bits(head)
-    u32 inttail = u32_from_bits(tail)
-
-    u32[2] exp = check_exponent(boolExpectedTarget, inthead)
-    assert(exp[0] == exp[1])
-    u32[2] mul = check_multiplier(boolExpectedTarget, inttail, exp[1])
-    assert(mul[0] == mul[1])
-    // return target if is valid
-    return boolPack256([...[false;32], ...boolExpectedTarget])
+import "utils/casts/u32_to_field.zok" as u32_to_field
+import "utils/casts/u64_to_field.zok" as u64_to_field
 
 // changes endianess in u32
 def change_val_endianness(u32 input) -> u32:
@@ -82,17 +45,38 @@ def get_prev_hash(u32[8] hash) -> field:
     u32[8] res = change_array_endainnes(hash)
     return u32Pack256(res)
 
+// returns traget from header place
+def get_target(u32 bits) -> field:
+    bool[32] boolBits = u32_to_bits(bits)
+
+    bool[32] head = [...[false;24],...boolBits[24..32]]
+    bool[32] tail = [...[false;8],...boolBits[16..24],...boolBits[8..16],...boolBits[0..8]]
+    
+    // remove length of tail
+    u64 inttail = u64_from_bits([...[false;32], ...tail])
+    // length of teraget of hex
+    u32 headInHex = (u32_from_bits(head)*2)-6
+    // number of shifts to left of head
+    u32 shitCount = headInHex % 16
+    // aditional 16b 0 numbers to append
+    u32 additionalFields = (headInHex-shitCount) / 16
+    // get num of bitwise shifts
+    shitCount = shitCount*4
+    for u32 i in 0..64 do
+        inttail = (i < shitCount) ? inttail << 1: inttail
+    endfor
+    
+    bool[64] bTarget = u64_to_bits(inttail)
+    // get resulting target and check if it is small enough for prefixing with 64 bits
+    bool[256] resTarget = (additionalFields == 3) ? [...bTarget, ...[false; (192)]] : [...[false; (64)], ...bTarget, ...[false; (128)]] 
+    
+    field resTargetField = boolPack256(resTarget)
+    return resTargetField
+
 // takes in epoch and vaildates it
-def main( field[5] firstInputHeader,
-        private field[31][5] inputHeaders,
-        u64[4] firstInputExpectedTarget,
-        private u64[31][4] inputExpectedTargets,
-        private field[31] inputCurrentHashes,
-        field inputLastCurrentHash,
-        field previousHash) -> bool:
+def main(field[5] firstInputHeader, private field[31][5] inputHeaders, private field[31] inputCurrentHashes, field inputLastCurrentHash, field previousHash) -> bool:
 
     field[32][5] headers = [firstInputHeader, ...inputHeaders]
-    u64[32][4] expectedTarget = [firstInputExpectedTarget, ...inputExpectedTargets]
     field[32] currentHashes = [...inputCurrentHashes, inputLastCurrentHash]
     
     for u32 i in 0..32 do
@@ -102,16 +86,23 @@ def main( field[5] firstInputHeader,
         u32[4] header3 = unpack128(headers[i][3])
         u32[4] header4 = unpack128(headers[i][4])
 
+        // calculate header hash
         field currentHashFromHeader = hash_block_header([header0,header1,header2,header3,header4])
-        field target = check_target(header4[2], expectedTarget[i])
-        field previousHashFromHeader = get_prev_hash( [...header0[1..4],...header1[0..4],header2[0]])
+        
+        // calculate target form header
+        field target = get_target(header4[2])
+
         // hash needs to be under target
-        assert(target > currentHashFromHeader)
+        // comparing smaller numebrs because of zokrates bug
+        assert((target/10) > (currentHashFromHeader/10))
+
         // hash needs to equal hash calculated in server
         assert(currentHashes[i] == currentHashFromHeader)
+        
         // previous hash field in header needs to equal previous hash
+        field previousHashFromHeader = get_prev_hash( [...header0[1..4],...header1[0..4],header2[0]])
         assert(previousHash == previousHashFromHeader)
         // set previous hash to current hash
         previousHash = currentHashFromHeader
     endfor
-    return true
+return true

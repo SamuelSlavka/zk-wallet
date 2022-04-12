@@ -6,27 +6,30 @@ from ..constants import *
 import argparse
 import sys
 
-
-headers = {
-    'Content-Type': 'application/json',
-    "X-Auth-Token": BTCTOKEN,
-}
-
 def getPayload(id, params, function):
     return {
-        "id": id,
+        "id": str(id),
         "jsonrpc": "2.0",
         "method": function,
         "params": [params],
     }
 
-def getBlockHeaders(begining, end):
+def getBlockHeaders(chainId, begining, end):
     """ create proof for block number """
+
+    token = DOGETOKEN if chainId else BTCTOKEN
+    provider = DOGEPROVIDER if chainId else BTCPROVIDER
+
+    headers = {
+        'Content-Type': 'application/json',
+        "x-api-key": token,
+        "X-Auth-Token": token,
+    }
+
     # get block hashes
-    payload = json.dumps([getPayload(block,block, 'getblockhash') for block in range(begining, end)])
-    response = requests.post(BTCPROVIDER, headers=headers, data=payload, allow_redirects=False, timeout=30)
-    
+    payload = json.dumps([getPayload(block, block, 'getblockhash') for block in range(begining, end)])
+    response = requests.post(provider, headers=headers, data=payload, allow_redirects=False, timeout=30)
     # get block headers
     payload = json.dumps([getPayload(block['id'], block['result'], 'getblock') for block in response.json()])
-    response = requests.post(BTCPROVIDER, headers=headers, data=payload, allow_redirects=False, timeout=30).json()
+    response = requests.post(provider, headers=headers, data=payload, allow_redirects=False, timeout=30).json()
     return response

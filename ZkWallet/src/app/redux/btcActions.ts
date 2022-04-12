@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
+import {NativeModules} from 'react-native';
 import { Payload } from './btcModels';
 import { BTC_URL, BTC_TOKEN, BTC_API_URL } from '../config';
 
@@ -8,6 +9,30 @@ const headers = {
     'X-Auth-Token': BTC_TOKEN,
 };
 
+export const getClosestHash = (
+    blockchainId: number,
+    password: string,
+    contractAddress: string,
+    abi: string,
+    target: number,
+  ) => {
+    return async (dispatch: any) => {
+      NativeModules.CommunicationNative.getClosestHash(
+        blockchainId,
+        password,
+        contractAddress,
+        abi,
+        target,
+        (str: any) => {
+          dispatch({
+            type: GET_BTC_CLOSEST_HASH,
+            payload: str,
+          });
+        },
+      );
+    };
+  };
+
 export const setCredentials = (address: string, pk: string) => {
     return async (dispatch: any) => {
         dispatch({
@@ -15,7 +40,7 @@ export const setCredentials = (address: string, pk: string) => {
             payload: {address, pk},
         });
     };
-    };
+};
 
 export const getAllTransactionsAtHeight = (height: number)  => {
     return async (dispatch: any) => {
@@ -100,6 +125,7 @@ export const getBtcHeaders = (begining: number, end: number) => {
     };
 };
 
+export const GET_BTC_CLOSEST_HASH = 'GET_BTC_CLOSEST_HASH';
 export const GET_BTC_TRANSACTIONS = 'GET_BTC_TRANSACTIONS';
 export const GET_BTC_HEADERS = 'GET_BTC_HEADERS';
 export const SET_BTC_CREDENTIALS = 'SET_BTC_CREDENTIALS';

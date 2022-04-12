@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { GET_DOGE_HEADERS, SET_DOGE_CREDENTIALS, GET_DOGE_TRANSACTIONS } from './dogeActions';
+import { GET_DOGE_HEADERS, SET_DOGE_CREDENTIALS, GET_DOGE_TRANSACTIONS, GET_DOGE_CLOSEST_HASH } from './dogeActions';
 import './btcModels';
 import { BtcHeader, BtcTransaction } from './btcModels';
 
@@ -8,6 +8,7 @@ const initialState = {
     dogeHeaders: [] as BtcHeader[],
     dogeTransactions: [] as BtcTransaction[],
     dogeCreadentails: { address: '' as string, pk: '' as string },
+    dogeClosestHash: '' as string,
 };
 
 function dogeReducer(state = initialState, action: any) {
@@ -26,6 +27,8 @@ function dogeReducer(state = initialState, action: any) {
             return { ...state, dogeTransactions: transactions, dogeBalance: action.payload.final_balance };
         case SET_DOGE_CREDENTIALS:
             return { ...state, dogeCreadentails: action.payload };
+        case GET_DOGE_CLOSEST_HASH:
+            return { ...state, dogeClosestHash: action.payload };
         case GET_DOGE_HEADERS:
             const newHeaders: BtcHeader[] = [];
             action.payload.forEach((header: any) => {

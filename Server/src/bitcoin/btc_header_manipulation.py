@@ -51,7 +51,6 @@ class BlockHeader:
                         for i in range(0, len(newTarget), chunk_size)]
         splitHeaderStr = ' '.join(str(x) for x in splitHeader)
         return splitHeaderStr
-
     @property
     def header(self):
         """ Returns bit representation of header """

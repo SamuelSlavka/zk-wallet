@@ -5,7 +5,6 @@ import {
   LOAD_ETH_ACCOUNT,
   GET_ETH_ADDRESS,
   GET_CONTRACT_INFO,
-  GET_CLOSEST_HASH,
   TRANSACTION_SENT,
 } from './ethActions';
 
@@ -14,7 +13,6 @@ const initialState = {
   ethBalance: '' as string,
   keyfile: '' as string,
   ethAddress: '' as string,
-  closestHash: '' as string,
   ethTransactionResult: '' as string,
   contract: {contract_address: '' as string, abi: '' as string},
 };
@@ -36,8 +34,6 @@ function ethReducer(state = initialState, action: any) {
       return {...state, keyfile: action.payload};
     case GET_ETH_ADDRESS:
       return {...state, ethAddress: action.payload};
-    case GET_CLOSEST_HASH:
-      return {...state, closestHash: action.payload};
     case TRANSACTION_SENT:
       return {...state, ethTransactionResult: action.payload};
     default:

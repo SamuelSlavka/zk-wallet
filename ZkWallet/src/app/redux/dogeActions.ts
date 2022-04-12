@@ -1,12 +1,37 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
 import { Payload } from './btcModels';
+import {NativeModules} from 'react-native';
 import { BTC_URL, BTC_TOKEN, BTC_API_URL } from '../config';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'X-Auth-Token': BTC_TOKEN,
 };
+
+export const getClosestHash = (
+    blockchainId: number,
+    password: string,
+    contractAddress: string,
+    abi: string,
+    target: number,
+  ) => {
+    return async (dispatch: any) => {
+      NativeModules.CommunicationNative.getClosestHash(
+        blockchainId,
+        password,
+        contractAddress,
+        abi,
+        target,
+        (str: any) => {
+          dispatch({
+            type: GET_DOGE_CLOSEST_HASH,
+            payload: str,
+          });
+        },
+      );
+    };
+  };
 
 export const setCredentials = (address: string, pk: string) => {
     return async (dispatch: any) => {
@@ -15,7 +40,7 @@ export const setCredentials = (address: string, pk: string) => {
             payload: {address, pk},
         });
     };
-    };
+};
 
 export const getAllTransactionsAtHeight = (height: number)  => {
     return async (dispatch: any) => {
@@ -100,6 +125,7 @@ export const getBtcHeaders = (begining: number, end: number) => {
     };
 };
 
+export const GET_DOGE_CLOSEST_HASH = 'GET_DOGE_CLOSEST_HASH';
 export const GET_DOGE_TRANSACTIONS = 'GET_DOGE_TRANSACTIONS';
 export const GET_DOGE_HEADERS = 'GET_DOGE_HEADERS';
 export const SET_DOGE_CREDENTIALS = 'SET_DOGE_CREDENTIALS';

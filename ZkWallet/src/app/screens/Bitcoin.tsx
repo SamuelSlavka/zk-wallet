@@ -11,8 +11,12 @@ import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
 import {BtcTransaction} from '../redux/btcModels';
 
-import {getBtcHeaders, getBalanceSummary} from '../redux/btcActions';
-import {getClosestHash, getInfo} from '../redux/ethActions';
+import {
+  getBtcHeaders,
+  getBalanceSummary,
+  getClosestHash,
+} from '../redux/btcActions';
+import {getInfo} from '../redux/ethActions';
 
 // const BitcoinJs = require('react-native-bitcoinjs-lib');
 // const BtcProof = require('bitcoin-proof');
@@ -36,11 +40,14 @@ const address = '37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5';
 // };
 
 const Bitcoin = () => {
-  const {btcHeaders, btcCreadentails, btcTransactions, btcBalance} =
-    useSelector((state: RootState) => state.bitcoinReducer);
-  const {closestHash, contract} = useSelector(
-    (state: RootState) => state.ethereumReducer,
-  );
+  const {
+    btcHeaders,
+    btcCreadentails,
+    btcTransactions,
+    btcBalance,
+    btcClosestHash,
+  } = useSelector((state: RootState) => state.bitcoinReducer);
+  const {contract} = useSelector((state: RootState) => state.ethereumReducer);
 
   const dispatch = useDispatch();
 
@@ -85,7 +92,7 @@ const Bitcoin = () => {
         <Text style={styles.header}>Last stored header:</Text>
         <Text>{btcHeaders?.[btcHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
-        <Text>{closestHash}</Text>
+        <Text>{btcClosestHash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>
@@ -99,7 +106,9 @@ const Bitcoin = () => {
           onPress={() => {
             getHash(
               'password',
-              parseInt(btcHeaders?.[btcHeaders.length - 1]?.height, 10),
+              50,
+              // todo
+              //parseInt(btcHeaders?.[btcHeaders.length - 1]?.height, 10),
             );
           }}
         />
