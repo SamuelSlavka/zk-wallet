@@ -14,8 +14,6 @@ import {getBtcHeaders, getBalanceSummary} from '../redux/dogeActions';
 import {getClosestHash, getInfo} from '../redux/ethActions';
 import {BtcTransaction} from '../redux/btcModels';
 
-import '../../../shim';
-
 const address = 'DJVuMyGR4pxiQn8o6nqAX8D4yZaF9BkBmz';
 
 const Dogecoin = () => {
@@ -40,6 +38,7 @@ const Dogecoin = () => {
   const getHash = (password: string, height: number) =>
     dispatch(
       getClosestHash(
+        1,
         password,
         contract.contract_address,
         JSON.stringify(contract.abi),

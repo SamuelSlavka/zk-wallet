@@ -53,12 +53,15 @@ def deploy_contract(contractInterface, account, w3):
             'gasPrice': gasPrice})
         logging.info('Estgas: ' + str(estgas))
 
+        # magic number to enable testnet interaction
+        # remove if this ever gets to production!!
+        gasMultiplier = 2
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
-            'gas': estgas,
-            'gasPrice': gasPrice})
+            'gas': int(estgas*gasMultiplier),
+            'gasPrice': int(gasPrice*gasMultiplier)})
 
         # sign the transaction
         signed = account.signTransaction(construct_txn)
@@ -86,7 +89,7 @@ def build_and_deploy(account, w3):
     return False
 
 
-def send_batches_to_contract(account, w3, contract_address, abi):
+def send_batches_to_contract(blockchainId, account, w3, contract_address, abi):
     """ Send inputs to contract method """
     if(w3.isConnected()):
         contract = w3.eth.contract(
@@ -99,7 +102,7 @@ def send_batches_to_contract(account, w3, contract_address, abi):
             try:
                 nonce = w3.eth.getTransactionCount(account.address)
                 transaction = contract.functions.submitBatches(
-                    [input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
+                    [blockchainId, input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
                 logging.info('nonce')
                 signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
                 logging.info('Transaction created')
@@ -122,6 +125,6 @@ def get_closest_hash(account, w3, contract_address, abi, height):
             address=contract_address,
             abi=abi
         )
-        result = contract.functions.getClosestHash(height,0).call()
+        result = contract.functions.getClosestHash(0, height, 2).call()
         logging.info(result)
     return False

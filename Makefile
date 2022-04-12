@@ -6,15 +6,11 @@ stop:
 init: 
 	USER=$(id -u) GROUP=$(id -g)
 	docker-compose build
-	python3 ./Server/src/smartContracts/zokrates_compilation.py
+	python3 ./Server/main.py compile
 
 # start dev enviroment
 dev:
 	docker-compose -f docker-compose-blockchainless.yml up --remove-orphans
-
-# start prod enviroment
-start:
-	docker-compose -f docker-compose.yml up --remove-orphans
 
 # compile and setup zokrates
 compile:
@@ -32,5 +28,6 @@ deploy:
 interact:
 	python3 ./Server/main.py interact
 
+# call contract method
 call:
 	python3 ./Server/main.py call

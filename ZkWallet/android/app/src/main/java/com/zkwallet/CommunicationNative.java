@@ -150,7 +150,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getClosestHash(String password, String contractAddress, String abi, int target, Callback cb) {
+    public void getClosestHash(int blockchainId, String password, String contractAddress, String abi, int target, Callback cb) {
         // call contract at address wih target as param
         Context ctx = new Context();
         try {
@@ -162,13 +162,16 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             BoundContract boundContract = Geth.bindContract(Geth.newAddressFromHex(contractAddress), abi, ec);
 
             // configuring smart contract args
-            Interface value = Geth.newInterface();
+            Interface height = Geth.newInterface();
             Interface startFork = Geth.newInterface();
-            value.setBigInt(Geth.newBigInt(target));
+            Interface chainId = Geth.newInterface();
+            height.setBigInt(Geth.newBigInt(target));
             startFork.setBigInt(Geth.newBigInt(0));
-            Interfaces params = Geth.newInterfaces(2);
-            params.set(0, value);
-            params.set(1, startFork);
+            chainId.setBigInt(Geth.newBigInt(blockchainId));
+            Interfaces params = Geth.newInterfaces(3);
+            params.set(0, chainId);
+            params.set(1, height);
+            params.set(2, startFork);
 
             // configuring return
             Interface result = Geth.newInterface();

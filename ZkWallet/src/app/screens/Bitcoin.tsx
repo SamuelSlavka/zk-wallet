@@ -57,6 +57,7 @@ const Bitcoin = () => {
   const getHash = (password: string, height: number) =>
     dispatch(
       getClosestHash(
+        0,
         password,
         contract.contract_address,
         JSON.stringify(contract.abi),

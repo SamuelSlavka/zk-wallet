@@ -7,29 +7,38 @@ import './Utils.sol' as utils;
 import './Structures.sol';
 
 contract HeaderList{
-    Chain headerChain;
+    mapping(uint => Chain) chains;
     /// @dev Create new blockchain.
     constructor() {
-        // init headerchain with btc genesis
-        headerChain.genesisHash = 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f;
-        headerChain.mainFork = 0;
-        headerChain.forkCount = 1;
-        headerChain.forks[0].forkHeight = 0;
-        headerChain.forks[0].previousFork = 0;
-        headerChain.forks[0].previousHeight = 0;
-        headerChain.forks[0].batches[0].height = 0;
-        headerChain.forks[0].batches[0].cumulativeDifficulty = 1;
-        headerChain.forks[0].batches[0].lastHeaderHash = headerChain.genesisHash;
+        // init chain 0 with btc genesis
+        setupChain(0, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f);
+        // init chain 1 with doge genesis
+        setupChain(1, 0x82bc68038f6034c0596b6e313729793a887fded6e92a31fbdf70863f89d9bea2);
+    }
+
+    /// @dev Setup blockchain.
+    function setupChain(uint chainId, uint256 genesis) private {
+        chains[chainId].genesisHash = genesis;
+        chains[chainId].mainFork = 0;
+        chains[chainId].forkCount = 1;
+        chains[chainId].forks[0].forkHeight = 0;
+        chains[chainId].forks[0].previousFork = 0;
+        chains[chainId].forks[0].previousHeight = 0;
+        chains[chainId].forks[0].batches[0].height = 0;
+        chains[chainId].forks[0].batches[0].cumulativeDifficulty = 1;
+        chains[chainId].forks[0].batches[0].lastHeaderHash = chains[chainId].genesisHash;
     }
 
     /// @dev Find fork contining hash at number or create a new one.
+    /// @param chainId id of current blockchain 0 - btc 1 - doge
     /// @param prevHash Hash that we search for.
     /// @param number Start height.
     /// @return uint256 Fork Id.
-    function findFork(uint256 prevHash, uint number) private returns(uint256) {
+    function findFork(uint chainId, uint256 prevHash, uint number) private returns(uint256) {
+        Chain storage headerChain = chains[chainId];
         // return 0 fork if does not find anything aditional check is necessary
         // otherwise returns fork number that contains at number last batch with ending hash of prevHash
-        for(uint i=1; i < headerChain.forkCount; i++){
+        for(uint i=1; i < chains[chainId].forkCount; i++){
             // if some fork can accept the batch at head
             if( headerChain.forks[i].forkHeight == number && 
                 headerChain.forks[i].batches[ number ].lastHeaderHash == prevHash ) {
@@ -50,10 +59,12 @@ contract HeaderList{
     event Log(string message, uint256 someNum);
 
     /// @dev Verifies array of batches and appedns them to storage.
+    /// @param chainId id of current blockchain 0 - btc 1 - doge
     /// @param inputs Array of inputs containing proof and zok argument.
     /// @param startHeight Start height og batch.
     /// @param endHeight End height of the batch.
-    function submitBatches(Input[] memory inputs, uint256 startHeight, uint256 endHeight) public {
+    function submitBatches(uint chainId, Input[] memory inputs, uint256 startHeight, uint256 endHeight) public {
+        Chain storage headerChain = chains[chainId];
         verifier.Verifier ver = new verifier.Verifier();
         Output memory firstInput = utils.parseInput(inputs[0].inputs);
         Output memory lastInput = utils.parseInput(inputs[inputs.length-1].inputs);
@@ -64,7 +75,7 @@ contract HeaderList{
         result.number = endHeight;
         
         // batch height
-        uint256 forkNumber = findFork(result.prevHash, startHeight-1);
+        uint256 forkNumber = findFork(chainId, result.prevHash, startHeight-1);
         
         // batch difficulty
         Fork storage fork = headerChain.forks[forkNumber];
@@ -117,10 +128,12 @@ contract HeaderList{
     event ClosestHash(uint256);
 
     /// @dev Returns closest hash to given height.
+    /// @param chainId id of current blockchain 0 - btc 1 - doge
     /// @param height Requested block height in blockchain.
     /// @param forkNumber Forknumber to search in initially should be 0.
     /// @return uint256 - Closest block hash.
-    function getClosestHash(uint height, uint forkNumber) public returns (uint256) {
+    function getClosestHash(uint chainId, uint height, uint forkNumber) public returns (uint256) {
+        Chain storage headerChain = chains[chainId];
         Fork storage mainFork = headerChain.forks[forkNumber];
         if(height > mainFork.forkHeight) {
             height = mainFork.forkHeight+1;
@@ -134,7 +147,7 @@ contract HeaderList{
             }
             else if(i == mainFork.previousHeight){
                 // if reached previous fork continue searching in it
-                return getClosestHash(mainFork.previousHeight, mainFork.previousFork);
+                return getClosestHash(chainId, mainFork.previousHeight, mainFork.previousFork);
             }
         }
         // not found

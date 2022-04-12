@@ -51,7 +51,8 @@ if(sys.argv[1] == 'interact'):
     if(web3.isConnected()):
         with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
             contract = json.load(file)
-            result = send_batches_to_contract(acc, web3, contract['contract_address'], contract['abi'])
+            # sends batches to bitcoin blockchain in contract
+            result = send_batches_to_contract(0, acc, web3, contract['contract_address'], contract['abi'])
     else:
         logging.info("could not connect to web3")
 

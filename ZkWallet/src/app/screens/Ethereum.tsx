@@ -17,6 +17,7 @@ const Ethereum = () => {
   const dispatch = useDispatch();
 
   const refreshData = () => {
+    console.log(ethAddress);
     dispatch(getBalance());
     dispatch(getAddress());
   };

@@ -4,6 +4,7 @@ import {NativeModules} from 'react-native';
 import {BASE_URL} from '../config';
 
 export const getClosestHash = (
+  blockchainId: number,
   password: string,
   contractAddress: string,
   abi: string,
@@ -11,6 +12,7 @@ export const getClosestHash = (
 ) => {
   return async (dispatch: any) => {
     NativeModules.CommunicationNative.getClosestHash(
+      blockchainId,
       password,
       contractAddress,
       abi,
