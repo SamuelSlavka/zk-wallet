@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 
 import Ethereum from '../screens/Ethereum';
 import Bitcoin from '../screens/Bitcoin';
-import Litecoin from '../screens/Litecoin';
+import Dogecoin from '../screens/Dogecoin';
 
 const Tab = createBottomTabNavigator();
 
@@ -22,7 +22,7 @@ const RootNavigator = () => {
         }}>
         <Tab.Screen name="Eth" component={Ethereum} />
         <Tab.Screen name="Btc" component={Bitcoin} />
-        <Tab.Screen name="Ltc" component={Litecoin} />
+        <Tab.Screen name="Doge" component={Dogecoin} />
       </Tab.Navigator>
     </NavigationContainer>
   );

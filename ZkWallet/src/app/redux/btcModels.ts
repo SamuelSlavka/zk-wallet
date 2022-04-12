@@ -49,10 +49,22 @@ export class Payload {
 export class BtcTransaction {
   tx_hash: string;
   value: number;
+  block_hash: string;
   block_height: number;
-  constructor(tx_hash: string, value: number, block_height: number) {
+  block_index: number;
+  validated: boolean = false;
+
+  constructor(
+    tx_hash: string,
+    value: number,
+    block_hash: string,
+    block_height: number,
+    block_index: number,
+  ) {
     this.tx_hash = tx_hash;
     this.value = value;
+    this.block_hash = block_hash;
     this.block_height = block_height;
+    this.block_index = block_index;
   }
 }

@@ -23,6 +23,7 @@
     "bip21": "^2.0.3",
     "bip32-utils": "^0.11.1",
     "bip39": "^3.0.4",
+    "bitcoin-proof": "^2.0.0",
     "browserify-zlib": "~0.1.4",
     "bs58check": "^2.1.2",
     "buffer": "^6.0.3",

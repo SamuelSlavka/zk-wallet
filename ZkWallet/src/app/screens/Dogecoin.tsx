@@ -9,35 +9,18 @@ import {
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
+
+import {getBtcHeaders, getBalanceSummary} from '../redux/dogeActions';
+import {getClosestHash, getInfo} from '../redux/ethActions';
 import {BtcTransaction} from '../redux/btcModels';
 
-import {getBtcHeaders, getBalanceSummary} from '../redux/btcActions';
-import {getClosestHash, getInfo} from '../redux/ethActions';
+import '../../../shim';
 
-// const BitcoinJs = require('react-native-bitcoinjs-lib');
-// const BtcProof = require('bitcoin-proof');
+const address = 'DJVuMyGR4pxiQn8o6nqAX8D4yZaF9BkBmz';
 
-const address = '37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5';
-
-// const initWallet = async () => {
-//   let masterKeychain = null;
-//   let action = 'none';
-
-//   const backupPhrase: string = 'phrase';
-//   console.log(backupPhrase);
-//   const seedBuffer = await bip39.mnemonicToSeed(backupPhrase);
-//   masterKeychain = await bitcoin.HDNode.fromSeedBuffer(seedBuffer);
-//   let keychain = {
-//     backupPhrase: backupPhrase,
-//     masterKeychain: masterKeychain,
-//     action: action,
-//   };
-//   return keychain;
-// };
-
-const Bitcoin = () => {
-  const {btcHeaders, btcCreadentails, btcTransactions, btcBalance} =
-    useSelector((state: RootState) => state.bitcoinReducer);
+const Dogecoin = () => {
+  const {dogeHeaders, dogeCreadentails, dogeTransactions, dogeBalance} =
+    useSelector((state: RootState) => state.dogecoinReducer);
   const {closestHash, contract} = useSelector(
     (state: RootState) => state.ethereumReducer,
   );
@@ -50,8 +33,8 @@ const Bitcoin = () => {
     dispatch(getBtcHeaders(0, 3));
 
     // setup creadentials in prenament storage
-    btcCreadentails.address = address;
-    console.log(btcCreadentails.address);
+    dogeCreadentails.address = address;
+    console.log(dogeCreadentails.address);
   };
 
   const getHash = (password: string, height: number) =>
@@ -68,7 +51,7 @@ const Bitcoin = () => {
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const listItems = btcTransactions.map((transaction: BtcTransaction) => (
+  const listItems = dogeTransactions.map((transaction: BtcTransaction) => (
     <View key={transaction.tx_hash}>
       <Text key={'1'}>tx: {transaction.tx_hash}</Text>
       <Text key={'2'}>at: {transaction.block_index}</Text>
@@ -82,15 +65,15 @@ const Bitcoin = () => {
     <SafeAreaView>
       <ScrollView>
         <Text style={styles.header}>Last stored header:</Text>
-        <Text>{btcHeaders?.[btcHeaders.length - 1]?.hash}</Text>
+        <Text>{dogeHeaders?.[dogeHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
         <Text>{closestHash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>
-        <Text>{btcCreadentails.address}</Text>
+        <Text>{dogeCreadentails.address}</Text>
         <Text style={styles.header}>Your balance:</Text>
-        <Text>{btcBalance}</Text>
+        <Text>{dogeBalance}</Text>
         <Text style={styles.header}>Your txses:</Text>
         <View>{listItems}</View>
         <Button
@@ -98,7 +81,7 @@ const Bitcoin = () => {
           onPress={() => {
             getHash(
               'password',
-              parseInt(btcHeaders?.[btcHeaders.length - 1]?.height, 10),
+              parseInt(dogeHeaders?.[dogeHeaders.length - 1]?.height, 10),
             );
           }}
         />
@@ -126,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Bitcoin;
+export default Dogecoin;

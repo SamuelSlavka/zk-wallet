@@ -1,18 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS, GET_BTC_TRANSACTIONS } from './btcActions';
+import { GET_DOGE_HEADERS, SET_DOGE_CREDENTIALS, GET_DOGE_TRANSACTIONS } from './dogeActions';
 import './btcModels';
 import { BtcHeader, BtcTransaction } from './btcModels';
 
 const initialState = {
-    btcBalance: 0 as number,
-    btcHeaders: [] as BtcHeader[],
-    btcTransactions: [] as BtcTransaction[],
-    btcCreadentails: { address: '' as string, pk: '' as string },
+    dogeBalance: 0 as number,
+    dogeHeaders: [] as BtcHeader[],
+    dogeTransactions: [] as BtcTransaction[],
+    dogeCreadentails: { address: '' as string, pk: '' as string },
 };
 
-function btcReducer(state = initialState, action: any) {
+function dogeReducer(state = initialState, action: any) {
     switch (action.type) {
-        case GET_BTC_TRANSACTIONS:
+        case GET_DOGE_TRANSACTIONS:
             const transactions = action.payload.txs.map(
                 function (transaction: any) {
                     return new BtcTransaction(
@@ -23,10 +23,10 @@ function btcReducer(state = initialState, action: any) {
                         transaction.block_index
                         );
                 });
-            return { ...state, btcTransactions: transactions, btcBalance: action.payload.final_balance };
-        case SET_BTC_CREDENTIALS:
-            return { ...state, btcCreadentails: action.payload };
-        case GET_BTC_HEADERS:
+            return { ...state, dogeTransactions: transactions, dogeBalance: action.payload.final_balance };
+        case SET_DOGE_CREDENTIALS:
+            return { ...state, dogeCreadentails: action.payload };
+        case GET_DOGE_HEADERS:
             const newHeaders: BtcHeader[] = [];
             action.payload.forEach((header: any) => {
                 const result = header.result;
@@ -44,10 +44,10 @@ function btcReducer(state = initialState, action: any) {
                     ),
                 );
             });
-            return { ...state, btcHeaders: newHeaders };
+            return { ...state, dogeHeaders: newHeaders };
         default:
             return state;
     }
 }
 
-export default btcReducer;
+export default dogeReducer;
