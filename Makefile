@@ -24,6 +24,10 @@ dogeproof:
 btcproof:
 	python3 ./Server/main.py btcproof
 
+# create bch proof
+bchproof:
+	python3 ./Server/main.py bchproof
+
 # interact with smart contract
 btcinteract:
 	python3 ./Server/main.py btcinteract
@@ -31,6 +35,10 @@ btcinteract:
 # interact with smart contract
 dogeinteract:
 	python3 ./Server/main.py dogeinteract
+
+# interact with smart contract
+bchinteract:
+	python3 ./Server/main.py bchinteract
 
 # deploy smart contracts
 deploy:

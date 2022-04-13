@@ -5,7 +5,7 @@ import thunk from 'redux-thunk';
 
 import ethReducer from './ethReducer';
 import btcReducer from './btcReducer';
-import dogeReducer from './dogeReducer';
+import bchReducer from './bchReducer';
 
 const persistEthConfig = {
   key: 'root',
@@ -22,7 +22,7 @@ const persistBtcConfig = {
 const rootReducer = combineReducers({
   ethereumReducer: persistReducer(persistEthConfig, ethReducer),
   bitcoinReducer: persistReducer(persistBtcConfig, btcReducer),
-  dogecoinReducer: dogeReducer,
+  bitcoinCashReducer: bchReducer,
 });
 
 export const store = createStore(rootReducer, applyMiddleware(thunk));

@@ -13,20 +13,20 @@ import {
   getBtcHeaders,
   getBalanceSummary,
   getClosestHash,
-} from '../redux/dogeActions';
+} from '../redux/bchActions';
 import {getInfo} from '../redux/ethActions';
 import {BtcTransaction} from '../redux/btcModels';
 
-const address = 'DJVuMyGR4pxiQn8o6nqAX8D4yZaF9BkBmz';
+const address = 'qrn29uc480r8ra8yvfyuzr35dhrs776hgye0fqpnem';
 
-const Dogecoin = () => {
+const BitcoinCash = () => {
   const {
-    dogeHeaders,
-    dogeCreadentails,
-    dogeTransactions,
-    dogeBalance,
-    dogeClosestHash,
-  } = useSelector((state: RootState) => state.dogecoinReducer);
+    bchHeaders,
+    bchCreadentails,
+    bchTransactions,
+    bchBalance,
+    bchClosestHash,
+  } = useSelector((state: RootState) => state.bitcoinCashReducer);
   const {contract} = useSelector((state: RootState) => state.ethereumReducer);
 
   const dispatch = useDispatch();
@@ -37,8 +37,8 @@ const Dogecoin = () => {
     dispatch(getBtcHeaders(0, 3));
 
     // setup creadentials in prenament storage
-    dogeCreadentails.address = address;
-    console.log(dogeCreadentails.address);
+    bchCreadentails.address = address;
+    console.log(bchCreadentails.address);
   };
 
   const getHash = (password: string, height: number) =>
@@ -56,12 +56,12 @@ const Dogecoin = () => {
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const listItems = dogeTransactions.map((transaction: BtcTransaction) => (
+  const listItems = bchTransactions.map((transaction: BtcTransaction) => (
     <View key={transaction.tx_hash}>
       <Text key={'1'}>tx: {transaction.tx_hash}</Text>
-      <Text key={'2'}>at: {transaction.block_index}</Text>
-      <Text key={'3'}>in bl: {transaction.block_hash}</Text>
-      <Text key={'4'}>at: {transaction.block_height}</Text>
+      <Text key={'2'}>at: {transaction.block_height}</Text>
+      <Text key={'3'}>in bl: {transaction.block_index}</Text>
+      <Text key={'4'}>spent: {transaction.spending_tx_hash}</Text>
       <Text key={'5'}>val: {transaction.validated?.toString()}</Text>
     </View>
   ));
@@ -70,15 +70,15 @@ const Dogecoin = () => {
     <SafeAreaView>
       <ScrollView>
         <Text style={styles.header}>Last stored header:</Text>
-        <Text>{dogeHeaders?.[dogeHeaders.length - 1]?.hash}</Text>
+        <Text>{bchHeaders?.[bchHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
-        <Text>{dogeClosestHash}</Text>
+        <Text>{bchClosestHash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>
-        <Text>{dogeCreadentails.address}</Text>
+        <Text>{bchCreadentails.address}</Text>
         <Text style={styles.header}>Your balance:</Text>
-        <Text>{dogeBalance}</Text>
+        <Text>{bchBalance}</Text>
         <Text style={styles.header}>Your txses:</Text>
         <View>{listItems}</View>
         <Button
@@ -88,7 +88,7 @@ const Dogecoin = () => {
               'password',
               50,
               // todo
-              // parseInt(dogeHeaders?.[dogeHeaders.length - 1]?.height, 10),
+              // parseInt(bchHeaders?.[bchHeaders.length - 1]?.height, 10),
             );
           }}
         />
@@ -101,7 +101,7 @@ const Dogecoin = () => {
         <Button
           title="Get headers"
           onPress={() => {
-            dispatch(getBtcHeaders(729325, 729330));
+            dispatch(getBtcHeaders(90, 96));
           }}
         />
       </ScrollView>
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dogecoin;
+export default BitcoinCash;

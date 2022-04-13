@@ -22,6 +22,8 @@ import {getInfo} from '../redux/ethActions';
 // const BtcProof = require('bitcoin-proof');
 
 const address = '37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5';
+//  !!! todo: get btc trancsactions: !!!
+// curl https://api.blockchair.com/bitcoin/outputs\?recepient\="37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5"
 
 // const initWallet = async () => {
 //   let masterKeychain = null;
@@ -79,9 +81,9 @@ const Bitcoin = () => {
   const listItems = btcTransactions.map((transaction: BtcTransaction) => (
     <View key={transaction.tx_hash}>
       <Text key={'1'}>tx: {transaction.tx_hash}</Text>
-      <Text key={'2'}>at: {transaction.block_index}</Text>
-      <Text key={'3'}>in bl: {transaction.block_hash}</Text>
-      <Text key={'4'}>at: {transaction.block_height}</Text>
+      <Text key={'2'}>at: {transaction.block_height}</Text>
+      <Text key={'3'}>in bl: {transaction.block_index}</Text>
+      <Text key={'4'}>spent: {transaction.spending_tx_hash}</Text>
       <Text key={'5'}>val: {transaction.validated?.toString()}</Text>
     </View>
   ));
@@ -121,7 +123,7 @@ const Bitcoin = () => {
         <Button
           title="Get headers"
           onPress={() => {
-            dispatch(getBtcHeaders(729325, 729330));
+            dispatch(getBtcHeaders(2, 4));
           }}
         />
       </ScrollView>
