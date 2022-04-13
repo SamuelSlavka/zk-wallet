@@ -26,20 +26,6 @@ def change_array_endainnes(u32[8] input) -> u32[8]:
     endfor
     return changed
 
-// make two sha256 on header
-def hash_block_header(u32[5][4] preimage) -> field:    
-    // combined into 256b fields and add padding
-    u32[8] preimage1 = [ ...preimage[0], ...preimage[1] ]
-    u32[8] preimage2 = [ ...preimage[2], ...preimage[3] ]
-    u32[8] preimage3 = [ ...preimage[4], 0x80000000,0x00000000,0x00000000,0x00000000 ]
-
-    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
-    
-    u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
-    u32[8] res = sha256for256(intermediary)
-    res = change_array_endainnes(res)
-	return u32Pack256(res)
-
 // return previous block hash from header
 def get_prev_hash(u32[8] hash) -> field:
     u32[8] res = change_array_endainnes(hash)
@@ -73,6 +59,20 @@ def get_target(u32 bits) -> field:
     field resTargetField = boolPack256(resTarget)
     return resTargetField
 
+// make two sha256 on header
+def hash_block_header(u32[5][4] preimage) -> field:    
+    // combined into 256b fields and add padding
+    u32[8] preimage1 = [ ...preimage[0], ...preimage[1] ]
+    u32[8] preimage2 = [ ...preimage[2], ...preimage[3] ]
+    u32[8] preimage3 = [ ...preimage[4], 0x80000000,0x00000000,0x00000000,0x00000000 ]
+
+    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
+    
+    u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
+    u32[8] res = sha256for256(intermediary)
+    res = change_array_endainnes(res)
+	return u32Pack256(res)
+
 // takes in epoch and vaildates it
 def main(field[5] firstInputHeader, private field[31][5] inputHeaders, private field[31] inputCurrentHashes, field inputLastCurrentHash, field previousHash) -> bool:
 
@@ -93,8 +93,7 @@ def main(field[5] firstInputHeader, private field[31][5] inputHeaders, private f
         field target = get_target(header4[2])
 
         // hash needs to be under target
-        // comparing smaller numebrs because of zokrates bug
-        assert((target/10) > (currentHashFromHeader/10))
+        assert((target) > (currentHashFromHeader))
 
         // hash needs to equal hash calculated in server
         assert(currentHashes[i] == currentHashFromHeader)

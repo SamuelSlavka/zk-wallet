@@ -5,13 +5,39 @@ from src.bitcoin.bitcoin import get_zk_input
 from src.constants import *
 from src.utils import *
 
-import sys, os, logging, json
+import sys
+import os
+import logging
+import json
 
 logging.basicConfig(level=logging.INFO)
 
 if(sys.argv[1] == 'compile'):
     if(compile_validator()):
         logging.info('Compilation succes')
+
+if(sys.argv[1] == 'btcproof'):
+    start = 1
+    end = 33
+    input = get_zk_input(0, start, end).strip('\"')
+    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
+        file.write(input)
+    logging.info('Input generated')
+    # write proof to solidity input file
+    compute_proof(0)
+    # if(compute_proof(0)):
+    #     # transfer proof to solidity acceptable format
+    #     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
+    #         with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
+    #             data = json.load(input)
+    #             result = {'start': start, 'end':end}
+    #             result['proof'] = {}
+    #             result['proof']['a'] = castStrListToHex(data["proof"]["a"])
+    #             result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
+    #             result['proof']['c'] = castStrListToHex(data["proof"]["c"])
+    #             result['proof']['inputs'] = castStrListToHex(data["inputs"])
+    #             file.write(json.dumps(result))
+
 
 if(sys.argv[1] == 'dogeproof'):
     start = 1
@@ -36,27 +62,27 @@ if(sys.argv[1] == 'dogeproof'):
 
     #             file.write(json.dumps(result))
 
-if(sys.argv[1] == 'btcproof'):
+if(sys.argv[1] == 'bchproof'):
     start = 1
     end = 33
-    input = get_zk_input(0,start,end).strip('\"')
-    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
+    input = get_zk_input(2, start, end).strip('\"')
+    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBch', 'w') as file:
         file.write(input)
     logging.info('Input generated')
     # write proof to solidity input file
-    if(compute_proof(0)):
-        # transfer proof to solidity acceptable format
-        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
-            with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
-                data = json.load(input)
-                result = {'start': start, 'end':end}
-                result['proof'] = {}
-                result['proof']['a'] = castStrListToHex(data["proof"]["a"])
-                result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
-                result['proof']['c'] = castStrListToHex(data["proof"]["c"])
-                result['proof']['inputs'] = castStrListToHex(data["inputs"])
-
-                file.write(json.dumps(result))
+    compute_proof(0)
+    # if(compute_proof(0)):
+    #     # transfer proof to solidity acceptable format
+    #     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
+    #         with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
+    #             data = json.load(input)
+    #             result = {'start': start, 'end':end}
+    #             result['proof'] = {}
+    #             result['proof']['a'] = castStrListToHex(data["proof"]["a"])
+    #             result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
+    #             result['proof']['c'] = castStrListToHex(data["proof"]["c"])
+    #             result['proof']['inputs'] = castStrListToHex(data["inputs"])
+    #             file.write(json.dumps(result))
 
 if(sys.argv[1] == 'deploy'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
@@ -75,7 +101,8 @@ if(sys.argv[1] == 'btcinteract'):
         with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
             contract = json.load(file)
             # sends batches to bitcoin blockchain in contract
-            result = send_batches_to_contract(0, acc, web3, contract['contract_address'], contract['abi'])
+            result = send_batches_to_contract(
+                0, acc, web3, contract['contract_address'], contract['abi'])
     else:
         logging.info("could not connect to web3")
 
@@ -86,7 +113,20 @@ if(sys.argv[1] == 'dogeinteract'):
         with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
             contract = json.load(file)
             # sends batches to bitcoin blockchain in contract
-            result = send_batches_to_contract(1, acc, web3, contract['contract_address'], contract['abi'])
+            result = send_batches_to_contract(
+                1, acc, web3, contract['contract_address'], contract['abi'])
+    else:
+        logging.info("could not connect to web3")
+
+if(sys.argv[1] == 'bchinteract'):
+    web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
+    acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
+    if(web3.isConnected()):
+        with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
+            contract = json.load(file)
+            # sends batches to bitcoin blockchain in contract
+            result = send_batches_to_contract(
+                2, acc, web3, contract['contract_address'], contract['abi'])
     else:
         logging.info("could not connect to web3")
 
@@ -96,6 +136,7 @@ if(sys.argv[1] == 'call'):
     if(web3.isConnected()):
         with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
             contract = json.load(file)
-            result = get_closest_hash(acc, web3, contract['contract_address'], contract['abi'], 90)
+            result = get_closest_hash(
+                acc, web3, contract['contract_address'], contract['abi'], 90)
     else:
         logging.info("could not connect to web3")

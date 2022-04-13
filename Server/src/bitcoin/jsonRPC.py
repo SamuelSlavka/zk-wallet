@@ -16,9 +16,15 @@ def getPayload(id, params, function):
 
 def getBlockHeaders(chainId, begining, end):
     """ create proof for block number """
-
-    token = DOGETOKEN if chainId else BTCTOKEN
-    provider = DOGEPROVIDER if chainId else BTCPROVIDER
+    if (chainId == 0):
+        token = BTCTOKEN
+        provider = BTCPROVIDER
+    if (chainId == 1):
+        token = DOGETOKEN
+        provider = DOGEPROVIDER
+    if (chainId == 2):
+        token = BCHTOKEN
+        provider = BCHPROVIDER
 
     headers = {
         'Content-Type': 'application/json',
