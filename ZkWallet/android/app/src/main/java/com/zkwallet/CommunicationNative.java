@@ -175,7 +175,7 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
 
             // configuring return
             Interface result = Geth.newInterface();
-            result.setDefaultBigInt();
+            result.setDefaultBigInts();
             Interfaces results = Geth.newInterfaces(1);
             results.set(0, result);
 
@@ -184,10 +184,12 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
             opts.setContext(ctx);
 
             boundContract.call(opts, results, "getClosestHash", params);
+
             // return result in callback
-            cb.invoke(results.get(0).getBigInt().string());
+            cb.invoke(results.get(0).getBigInts().get(0).string(),
+                    results.get(0).getBigInts().get(1).string());
         } catch (Exception e) {
-            cb.invoke("error");
+            cb.invoke("error", e.getMessage());
             android.util.Log.d("error", e.getMessage());
             e.printStackTrace();
         }

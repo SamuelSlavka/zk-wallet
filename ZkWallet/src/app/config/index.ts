@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://192.168.0.106';
+export const BASE_URL = 'http://172.17.0.1';
 
 export const BTC_URL = 'https://btccore-main.bdnodes.net';
 export const DOGE_URL =

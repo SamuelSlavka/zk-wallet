@@ -1,19 +1,20 @@
 /* eslint-disable prettier/prettier */
-import { GET_BCH_HEADERS, SET_BCH_CREDENTIALS, GET_BCH_TRANSACTIONS, GET_BCH_CLOSEST_HASH } from './bchActions';
-import './btcModels';
-import { BtcHeader, BtcTransaction } from './btcModels';
+import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS, GET_BTC_TRANSACTIONS, GET_BTC_CLOSEST_HASH } from './btcActions';
+import '../btcModels';
+import { BtcHeader, BtcTransaction } from '../btcModels';
 
 const initialState = {
-    bchBalance: 0 as number,
-    bchHeaders: [] as BtcHeader[],
-    bchTransactions: [] as BtcTransaction[],
-    bchCreadentails: { address: '' as string, pk: '' as string },
-    bchClosestHash: '' as string,
+    btcBalance: 0 as number,
+    btcHeaders: [] as BtcHeader[],
+    btcValidHeaders: {},
+    btcTransactions: [] as BtcTransaction[],
+    btcCreadentails: { address: '' as string, pk: '' as string },
+    btcClosestHash: { hash: 0 as number, height: 0 as number },
 };
 
-function bchReducer(state = initialState, action: any) {
+function btcReducer(state = initialState, action: any) {
     switch (action.type) {
-        case GET_BCH_TRANSACTIONS:
+        case GET_BTC_TRANSACTIONS:
             const transactions = action.payload.data.map(
                 function (transaction: any) {
                     return new BtcTransaction(
@@ -29,12 +30,14 @@ function bchReducer(state = initialState, action: any) {
             const balance = transactions.reduce(function (previousValue : any, currentValue : any): number {
                 return previousValue + currentValue.spending_block_id ? 0 : currentValue.value;
             }, 0);
-            return { ...state, bchTransactions: transactions, bchBalance: balance };
-        case SET_BCH_CREDENTIALS:
-            return { ...state, bchCreadentails: action.payload };
-        case GET_BCH_CLOSEST_HASH:
-            return { ...state, bchClosestHash: action.payload };
-        case GET_BCH_HEADERS:
+
+            return { ...state, btcTransactions: transactions, btcBalance: balance };
+        case SET_BTC_CREDENTIALS:
+            return { ...state, btcCreadentails: action.payload };
+        case GET_BTC_CLOSEST_HASH:
+            console.log(action.payload);
+            return { ...state, btcClosestHash: action.payload };
+        case GET_BTC_HEADERS:
             const newHeaders: BtcHeader[] = [];
             action.payload.data.forEach((header: any) => {
                 newHeaders.push(
@@ -50,10 +53,10 @@ function bchReducer(state = initialState, action: any) {
                     ),
                 );
             });
-            return { ...state, bchHeaders: newHeaders };
+            return { ...state, btcHeaders: newHeaders };
         default:
             return state;
     }
 }
 
-export default bchReducer;
+export default btcReducer;

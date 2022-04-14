@@ -4,8 +4,8 @@ import {persistStore, persistReducer} from 'redux-persist';
 import thunk from 'redux-thunk';
 
 import ethReducer from './ethReducer';
-import btcReducer from './btcReducer';
-import bchReducer from './bchReducer';
+import btcReducer from './btc/btcReducer';
+import bchReducer from './bch/bchReducer';
 
 const persistEthConfig = {
   key: 'root',

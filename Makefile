@@ -16,10 +16,6 @@ dev:
 compile:
 	python3 ./Server/main.py compile
 
-# create doge proof
-dogeproof:
-	python3 ./Server/main.py dogeproof
-
 # create btc proof
 btcproof:
 	python3 ./Server/main.py btcproof
@@ -31,10 +27,6 @@ bchproof:
 # interact with smart contract
 btcinteract:
 	python3 ./Server/main.py btcinteract
-
-# interact with smart contract
-dogeinteract:
-	python3 ./Server/main.py dogeinteract
 
 # interact with smart contract
 bchinteract:

@@ -15,15 +15,13 @@ import {
   getBtcHeaders,
   getBalanceSummary,
   getClosestHash,
-} from '../redux/btcActions';
+} from '../redux/btc/btcActions';
 import {getInfo} from '../redux/ethActions';
 
 // const BitcoinJs = require('react-native-bitcoinjs-lib');
 // const BtcProof = require('bitcoin-proof');
 
 const address = '37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5';
-//  !!! todo: get btc trancsactions: !!!
-// curl https://api.blockchair.com/bitcoin/outputs\?recepient\="37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5"
 
 // const initWallet = async () => {
 //   let masterKeychain = null;
@@ -78,6 +76,7 @@ const Bitcoin = () => {
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const listItems = btcTransactions.map((transaction: BtcTransaction) => (
     <View key={transaction.tx_hash}>
       <Text key={'1'}>tx: {transaction.tx_hash}</Text>
@@ -94,7 +93,7 @@ const Bitcoin = () => {
         <Text style={styles.header}>Last stored header:</Text>
         <Text>{btcHeaders?.[btcHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
-        <Text>{btcClosestHash}</Text>
+        <Text>{btcClosestHash.hash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>
@@ -110,7 +109,7 @@ const Bitcoin = () => {
               'password',
               50,
               // todo
-              //parseInt(btcHeaders?.[btcHeaders.length - 1]?.height, 10),
+              // parseInt(btcHeaders?.[btcHeaders.length - 1]?.height, 10),
             );
           }}
         />

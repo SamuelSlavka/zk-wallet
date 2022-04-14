@@ -13,7 +13,7 @@ import {
   getBtcHeaders,
   getBalanceSummary,
   getClosestHash,
-} from '../redux/bchActions';
+} from '../redux/bch/bchActions';
 import {getInfo} from '../redux/ethActions';
 import {BtcTransaction} from '../redux/btcModels';
 
@@ -72,7 +72,7 @@ const BitcoinCash = () => {
         <Text style={styles.header}>Last stored header:</Text>
         <Text>{bchHeaders?.[bchHeaders.length - 1]?.hash}</Text>
         <Text style={styles.header}>Closest hash:</Text>
-        <Text>{bchClosestHash}</Text>
+        <Text>{bchClosestHash.hash}</Text>
         <Text style={styles.header}>Contract address:</Text>
         <Text>{contract.contract_address}</Text>
         <Text style={styles.header}>Your address:</Text>

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
 import {NativeModules} from 'react-native';
-import { BTC_TOKEN, BLOCKCHAIR_URL } from '../config';
+import { BTC_TOKEN, BLOCKCHAIR_URL } from '../../config';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -22,10 +22,10 @@ export const getClosestHash = (
         contractAddress,
         abi,
         target,
-        (str: any) => {
+        (hash: any, height: any) => {
           dispatch({
-            type: GET_BCH_CLOSEST_HASH,
-            payload: str,
+            type: GET_BTC_CLOSEST_HASH,
+            payload: {hash: hash, height: height},
           });
         },
       );
@@ -35,7 +35,7 @@ export const getClosestHash = (
 export const setCredentials = (address: string, pk: string) => {
     return async (dispatch: any) => {
         dispatch({
-            type: SET_BCH_CREDENTIALS,
+            type: SET_BTC_CREDENTIALS,
             payload: {address, pk},
         });
     };
@@ -45,12 +45,12 @@ export const getBalanceSummary = (address: string)  => {
     return async (dispatch: any) => {
         axios({
             method: 'get',
-            url: BLOCKCHAIR_URL + '/bitcoin-cash/outputs?s=value(desc)&q=recipient(' + address + ')#f=transaction_hash,value,recipient,block_id,transaction_id,index,spending_transaction_hash,is_spent,time',
+            url: BLOCKCHAIR_URL + '/bitcoin/outputs?s=value(desc)&q=recipient(' + address + ')#f=transaction_hash,value,recipient,block_id,transaction_id,index,spending_transaction_hash,is_spent,time',
             headers: headers,
         })
         .then(response => {
             dispatch({
-                type: GET_BCH_TRANSACTIONS,
+                type: GET_BTC_TRANSACTIONS,
                 payload: response.data,
             });
         })
@@ -62,16 +62,17 @@ export const getBalanceSummary = (address: string)  => {
 
 // finds set of headers by theirs height
 export const getBtcHeaders = (begining: number, end: number) => {
+
     return async (dispatch: any) => {
         // get header hashes by their numbers
         axios({
             method: 'get',
-            url: BLOCKCHAIR_URL + '/bitcoin-cash/blocks?s=id(desc)&q=id(' + begining + '..' + end + ')#f=id,hash,time,transaction_count,version_hex,merkle_root,bits,nonce,difficulty',
+            url: BLOCKCHAIR_URL + '/bitcoin/blocks?s=id(desc)&q=id(' + begining + '..' + end + ')#f=id,hash,time,transaction_count,version_hex,merkle_root,bits,nonce,difficulty',
             headers: headers,
         })
         .then(response => {
             dispatch({
-                type: GET_BCH_HEADERS,
+                type: GET_BTC_HEADERS,
                 payload: response.data,
             });
         })
@@ -82,8 +83,8 @@ export const getBtcHeaders = (begining: number, end: number) => {
     };
 };
 
-export const GET_BCH_CLOSEST_HASH = 'GET_BCH_CLOSEST_HASH';
-export const GET_BCH_TRANSACTIONS = 'GET_BCH_TRANSACTIONS';
-export const GET_BCH_HEADERS = 'GET_BCH_HEADERS';
-export const SET_BCH_CREDENTIALS = 'SET_BCH_CREDENTIALS';
+export const GET_BTC_CLOSEST_HASH = 'GET_BTC_CLOSEST_HASH';
+export const GET_BTC_TRANSACTIONS = 'GET_BTC_TRANSACTIONS';
+export const GET_BTC_HEADERS = 'GET_BTC_HEADERS';
+export const SET_BTC_CREDENTIALS = 'SET_BTC_CREDENTIALS';
 

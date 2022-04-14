@@ -20,14 +20,14 @@ def compile_validator():
         subprocess.run('zokrates compile -i btcValidation.zok', shell=True, cwd=working_directory)
         logging.info('Compilation finished')
         # setup zksanrks (!warning this produces toxic waste!)
-        # subprocess.run('zokrates setup', shell=True, cwd=working_directory)
-        # logging.info('Setup finished')
+        subprocess.run('zokrates setup', shell=True, cwd=working_directory)
+        logging.info('Setup finished')
         # # create smart contract 
-        # subprocess.run('zokrates export-verifier', shell=True, cwd=working_directory)
-        # logging.info('Verifier exported')
+        subprocess.run('zokrates export-verifier', shell=True, cwd=working_directory)
+        logging.info('Verifier exported')
         # # update contract
-        # subprocess.run('cp verifier.sol ../contracts/verifier.sol', shell=True, cwd=working_directory)
-        # logging.info('Updated verifier')
+        subprocess.run('cp verifier.sol ../contracts/verifier.sol', shell=True, cwd=working_directory)
+        logging.info('Updated verifier')
         
         return True
     except Exception as err:
@@ -40,13 +40,13 @@ def compute_proof(chainId):
     try:
         init_zokrates(working_directory)
         logging.info('Zokratres initiated')
-        input = '/zokratesInputDoge' if chainId else '/zokratesInputBtc'
+        input = '/zokratesInputBch' if chainId == 2 else '/zokratesInputBtc'
         with open(working_directory + input, 'r') as file:
             data = file.read().rstrip()
             subprocess.run('zokrates compute-witness -a ' + data, shell=True, cwd=working_directory)
             logging.info('Witness created')
-            # subprocess.run('zokrates generate-proof', shell=True, cwd=working_directory)
-            # logging.info('Proof created')
+            subprocess.run('zokrates generate-proof', shell=True, cwd=working_directory)
+            logging.info('Proof created')
         return True
     except Exception as err:
         logging.error("Error '{0}' occurred.".format(err))

@@ -41,27 +41,28 @@ def deploy_contract(contractInterface, account, w3):
             bytecode=contractInterface['bytecode']
         )
 
-        # get gas
-        gasPrice = w3.eth.generate_gas_price()
-        logging.info('GasPrice: ' + str(gasPrice))
-
-        # estimate gas
-        estgas = contract.constructor().estimateGas({
-            'from': account.address,
-            'nonce': w3.eth.getTransactionCount(account.address),
-            'gas': 20000000,
-            'gasPrice': gasPrice})
-        logging.info('Estgas: ' + str(estgas))
-
         # magic number to enable testnet interaction
         # remove if this ever gets to production!!
-        gasMultiplier = 2
+        gasMultiplier = 5
+
+        # get gas
+        gasPrice = w3.eth.generate_gas_price() * gasMultiplier
+        logging.info('GasPrice: ' + str(gasPrice))
+
+        # estimate gas maybe not necessary
+        # estgas = contract.constructor().estimateGas({
+        #     'from': account.address,
+        #     'nonce': w3.eth.getTransactionCount(account.address),
+        #     'gas': 20000000,
+        #     'gasPrice': gasPrice}) * gasMultiplier
+        # logging.info('Estgas: ' + str(estgas))
+
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,
             'nonce': w3.eth.getTransactionCount(account.address),
-            'gas': int(estgas*gasMultiplier),
-            'gasPrice': int(gasPrice*gasMultiplier)})
+            'gasPrice': gasPrice,
+            })
 
         # sign the transaction
         signed = account.signTransaction(construct_txn)

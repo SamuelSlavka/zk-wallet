@@ -14,6 +14,8 @@ contract HeaderList{
         setupChain(0, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f);
         // init chain 1 with doge genesis
         setupChain(1, 0x82bc68038f6034c0596b6e313729793a887fded6e92a31fbdf70863f89d9bea2);
+        // init chain 2 with bch genesis
+        setupChain(2, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f);
     }
 
     /// @dev Setup blockchain.
@@ -132,8 +134,9 @@ contract HeaderList{
     /// @param height Requested block height in blockchain.
     /// @param forkNumber Forknumber to search in initially should be 0.
     /// @return uint256 - Closest block hash.
-    function getClosestHash(uint chainId, uint height, uint forkNumber) public returns (uint256) {
+    function getClosestHash(uint chainId, uint height, uint forkNumber) public returns (uint256[] memory)  {
         Chain storage headerChain = chains[chainId];
+        uint256[] memory ReturnVal = new uint256[](2);
         Fork storage mainFork = headerChain.forks[forkNumber];
         if(height > mainFork.forkHeight) {
             height = mainFork.forkHeight+1;
@@ -143,7 +146,9 @@ contract HeaderList{
             // if reached some hash return it
             if(mainFork.batches[i].lastHeaderHash != 0){
                 emit ClosestHash(mainFork.batches[i].lastHeaderHash);
-                return mainFork.batches[i].lastHeaderHash;
+                ReturnVal[0] = mainFork.batches[i].lastHeaderHash;
+                ReturnVal[1] = mainFork.batches[i].height;
+                return ReturnVal;
             }
             else if(i == mainFork.previousHeight){
                 // if reached previous fork continue searching in it
@@ -152,6 +157,6 @@ contract HeaderList{
         }
         // not found
         emit ClosestHash(0);
-        return 0;
+        return ReturnVal;
     }
 }
