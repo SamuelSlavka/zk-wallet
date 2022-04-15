@@ -1,7 +1,6 @@
 from flask import Flask
 
-from src.ethereum import get_last_transaction, init_eth_with_pk, get_contract_info
-from src.bitcoin import get_zk_input
+from src.ethereum import init_eth_with_pk, get_contract_info
 from src.constants import *
 
 # Initialize flask app
@@ -21,16 +20,6 @@ def home():
 def getContractInfo():
     """ Deployed contract information """
     return get_contract_info(), 200
-
-@app.route('/eth/')
-def lastTransaction():
-    """ Returns last transaction on current blockchain """
-    return get_last_transaction(web3), 200
-
-@app.route('/btc')
-def createBtcWitness():
-    """ Creates proof for headers """
-    return get_zk_input(1,3), 200
 
 # Run the server
 if __name__ == '__main__':

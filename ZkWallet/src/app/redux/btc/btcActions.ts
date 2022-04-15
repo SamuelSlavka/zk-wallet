@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { NativeModules } from 'react-native';
 import { BTC_TOKEN, BLOCKCHAIR_URL, BTC_URL } from '../../config';
-import { Payload } from '../btcModels';
+import { Payload, ClosestHashParams } from '../btcModels';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -10,30 +10,31 @@ const headers = {
     'x-api-key': BTC_TOKEN,
 };
 
-export const getClosestHash = (
-    blockchainId: number,
-    password: string,
-    contractAddress: string,
-    abi: string,
-    target: number,
-) => {
+// return closest hash to given height from smart contract
+export const getClosestHash = ( params: ClosestHashParams )  => {
     return async (dispatch: any) => {
         NativeModules.CommunicationNative.getClosestHash(
-            blockchainId,
-            password,
-            contractAddress,
-            abi,
-            target,
+            params.blockchainId,
+            params.password,
+            params.contractAddress,
+            params.abi,
+            params.target,
             (hash: any, height: any) => {
                 dispatch({
                     type: GET_BTC_CLOSEST_HASH,
-                    payload: { hash: hash, height: height },
+                    payload: { hash: hash, height: height, target: params.target },
                 });
             },
         );
     };
 };
 
+// catch up to given height with headers
+export const catchUp = ( start: number, end: number )  => {
+    console.log(start, end);
+};
+
+// save credentials to prenament storage
 export const setCredentials = (address: string, pk: string) => {
     return async (dispatch: any) => {
         dispatch({
@@ -43,6 +44,7 @@ export const setCredentials = (address: string, pk: string) => {
     };
 };
 
+// get all outgoing transactions from an address
 export const getBalanceSummary = (address: string) => {
     return async (dispatch: any) => {
         axios({

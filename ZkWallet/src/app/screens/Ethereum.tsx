@@ -5,13 +5,15 @@ import {
   newAccount,
   getAddress,
   sendTransaction,
+  getInfo,
 } from '../redux/ethActions';
 
+import ButtonComponent from '../components/ButtonComponent';
 import {RootState} from '../redux/store';
-import {Button, Text, SafeAreaView, StyleSheet} from 'react-native';
+import {Text, SafeAreaView, StyleSheet} from 'react-native';
 
 const Ethereum = () => {
-  const {ethBalance, keyfile, ethAddress} = useSelector(
+  const {ethBalance, keyfile, ethAddress, contract} = useSelector(
     (state: RootState) => state.ethereumReducer,
   );
   const dispatch = useDispatch();
@@ -20,6 +22,7 @@ const Ethereum = () => {
     console.log(ethAddress);
     dispatch(getBalance());
     dispatch(getAddress());
+    dispatch(getInfo());
   };
 
   const sendEthTransaction = () => {
@@ -50,21 +53,23 @@ const Ethereum = () => {
       <Text>{ethAddress}</Text>
       <Text style={styles.header}>Your balance:</Text>
       <Text>{ethBalance}</Text>
-      <Button
+      <Text style={styles.header}>Contract address:</Text>
+      <Text>{contract.contract_address}</Text>
+      <ButtonComponent
         title="refresh"
-        onPress={() => {
+        callback={() => {
           refreshData();
         }}
       />
-      <Button
+      <ButtonComponent
         title="setup account"
-        onPress={() => {
+        callback={() => {
           newEthAccount('password', 'exportPassword');
         }}
       />
-      <Button
+      <ButtonComponent
         title="send transaction"
-        onPress={() => {
+        callback={() => {
           sendEthTransaction();
         }}
       />

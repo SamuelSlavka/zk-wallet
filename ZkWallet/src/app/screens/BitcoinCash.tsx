@@ -60,7 +60,7 @@ const BitcoinCash = () => {
     <View key={transaction.tx_hash}>
       <Text key={'1'}>tx: {transaction.tx_hash}</Text>
       <Text key={'2'}>at: {transaction.block_height}</Text>
-      <Text key={'3'}>in bl: {transaction.block_index}</Text>
+      <Text key={'3'}>in bl: {transaction.transaction_id}</Text>
       <Text key={'4'}>spent: {transaction.spending_tx_hash}</Text>
       <Text key={'5'}>val: {transaction.validated?.toString()}</Text>
     </View>

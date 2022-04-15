@@ -11,22 +11,22 @@ contract HeaderList{
     /// @dev Create new blockchain.
     constructor() {
         // init chain 0 with btc genesis
-        setupChain(0, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f);
+        setupChain(0, 0x00000000000000000002a6a5843409a1e07c20f2ad1047d07491e5b86ae09f03, 729300);
         // init chain 1 with doge genesis
-        setupChain(1, 0x82bc68038f6034c0596b6e313729793a887fded6e92a31fbdf70863f89d9bea2);
+        setupChain(1, 0x82bc68038f6034c0596b6e313729793a887fded6e92a31fbdf70863f89d9bea2, 1);
         // init chain 2 with bch genesis
-        setupChain(2, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f);
+        setupChain(2, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f, 1);
     }
 
     /// @dev Setup blockchain.
-    function setupChain(uint chainId, uint256 genesis) private {
+    function setupChain(uint chainId, uint256 genesis, uint256 initHeight) private {
         chains[chainId].genesisHash = genesis;
         chains[chainId].mainFork = 0;
         chains[chainId].forkCount = 1;
         chains[chainId].forks[0].forkHeight = 0;
         chains[chainId].forks[0].previousFork = 0;
         chains[chainId].forks[0].previousHeight = 0;
-        chains[chainId].forks[0].batches[0].height = 0;
+        chains[chainId].forks[0].batches[0].height = initHeight;
         chains[chainId].forks[0].batches[0].cumulativeDifficulty = 1;
         chains[chainId].forks[0].batches[0].lastHeaderHash = chains[chainId].genesisHash;
     }

@@ -111,7 +111,7 @@ export class Payload {
 // basic transaction structure
 export class BtcTransaction {
   tx_hash: string;
-  block_index: number;
+  transaction_id: number;
   value: number;
   block_height: number;
   validated: boolean = false;
@@ -121,15 +121,36 @@ export class BtcTransaction {
     tx_hash: string,
     value: number,
     block_height: number,
-    block_index: number,
+    transaction_id: number,
     spending_tx_hash: string,
     spending_block_id: number,
   ) {
     this.tx_hash = tx_hash;
     this.value = value;
     this.block_height = block_height;
-    this.block_index = block_index;
+    this.transaction_id = transaction_id;
     this.spending_tx_hash = spending_tx_hash;
     this.spending_block_id = spending_block_id;
+  }
+}
+
+export class ClosestHashParams {
+  blockchainId: number;
+  password: string;
+  contractAddress: string;
+  abi: string;
+  target: number;
+  constructor(
+    blockchainId: number,
+    password: string,
+    contractAddress: string,
+    abi: string,
+    target: number,
+  ) {
+    this.blockchainId = blockchainId;
+    this.password = password;
+    this.contractAddress = contractAddress;
+    this.abi = abi;
+    this.target = target;
   }
 }

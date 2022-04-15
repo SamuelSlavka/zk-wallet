@@ -10,7 +10,7 @@ const initialState = {
     btcValidHeaders: {} as ValidatedHeader,
     btcTransactions: [] as BtcTransaction[],
     btcCreadentails: { address: '' as string, pk: '' as string },
-    btcClosestHash: { hash: 0 as number, height: 0 as number },
+    btcClosestHash: { hash: '' as string, height: 0 as number },
 };
 
 function btcReducer(state = initialState, action: any) {
@@ -39,7 +39,23 @@ function btcReducer(state = initialState, action: any) {
                     ...state.btcValidHeaders,
                     [action.payload.height]: BigInt(action.payload.hash).toString(16),
                 };
-            return { ...state, btcClosestHash: action.payload, btcValidHeaders: validHeaders };
+            // set it as closest hash
+            var closestHash = {
+                hash: BigInt(action.payload.hash).toString(16),
+                height: action.payload.height,
+            };
+            // check if there is another validated header closer
+            for (var i = action.payload.target; i > action.payload.height; i--){
+                if (validHeaders[i]){
+                    closestHash = {
+                        hash: validHeaders[i],
+                        height: i,
+                    };
+                    break;
+                }
+            }
+
+            return { ...state, btcClosestHash: closestHash, btcValidHeaders: validHeaders };
         case GET_BTC_HEADERS:
             const newHeaders: BtcHeader[] = [];
             action.payload.data.forEach((header: any) => {
@@ -59,7 +75,7 @@ function btcReducer(state = initialState, action: any) {
                 // we store only calculated header to check for stuff
                 const prevHash = state.btcValidHeaders[parseInt(newHeader.height, 10) - 1];
                 if (prevHash && newHeader.checkValidity(prevHash)) {
-                    console.log('got here')
+                    console.log('got here');
                     const hash1 = newHeader.getHash();
                     state.btcValidHeaders[parseInt(newHeader.height, 10)] = hash1;
                 }
