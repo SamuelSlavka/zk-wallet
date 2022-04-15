@@ -2,6 +2,9 @@
 
 ### A client-server framework for mobile wallet that will utilize zk-SNARKs as a storage optimization technique.
 
+## Initial setup
+For each file ending with .dist create file with the same name with the same contents, but without .dist ending. Afterwadrs replace all REPLACEME values with your prefered configuration.
+
 ## Server setup
 #### build docker and compile zokratess program
     make init

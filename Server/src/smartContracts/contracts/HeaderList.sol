@@ -133,9 +133,10 @@ contract HeaderList{
     /// @param chainId id of current blockchain 0 - btc 1 - doge
     /// @param height Requested block height in blockchain.
     /// @param forkNumber Forknumber to search in initially should be 0.
-    /// @return uint256 - Closest block hash.
+    /// @return uint256[] - Closest block hash and its height.
     function getClosestHash(uint chainId, uint height, uint forkNumber) public returns (uint256[] memory)  {
         Chain storage headerChain = chains[chainId];
+        // using undefined array length for geth warpper compatibility
         uint256[] memory ReturnVal = new uint256[](2);
         Fork storage mainFork = headerChain.forks[forkNumber];
         if(height > mainFork.forkHeight) {

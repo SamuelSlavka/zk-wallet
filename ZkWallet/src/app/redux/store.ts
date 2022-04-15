@@ -7,22 +7,29 @@ import ethReducer from './ethReducer';
 import btcReducer from './btc/btcReducer';
 import bchReducer from './bch/bchReducer';
 
+// set up persistent data storage in redux
 const persistEthConfig = {
-  key: 'root',
+  key: 'eth',
   storage: AsyncStorage,
   whitelist: ['keyfile', 'contract', 'closestHash'],
 };
 
 const persistBtcConfig = {
-  key: 'root',
+  key: 'btc',
   storage: AsyncStorage,
-  whitelist: ['btcHeaders', 'btcCreadentails'],
+  whitelist: ['btcHeaders', 'btcCreadentails', 'btcValidHeaders'],
+};
+
+const persistBchConfig = {
+  key: 'bch',
+  storage: AsyncStorage,
+  whitelist: ['bchHeaders', 'bchCreadentails', 'bchValidHeaders'],
 };
 
 const rootReducer = combineReducers({
   ethereumReducer: persistReducer(persistEthConfig, ethReducer),
   bitcoinReducer: persistReducer(persistBtcConfig, btcReducer),
-  bitcoinCashReducer: bchReducer,
+  bitcoinCashReducer: persistReducer(persistBchConfig, bchReducer),
 });
 
 export const store = createStore(rootReducer, applyMiddleware(thunk));

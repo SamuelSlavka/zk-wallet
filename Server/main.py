@@ -18,24 +18,24 @@ if(sys.argv[1] == 'compile'):
 
 if(sys.argv[1] == 'btcproof'):
     start = 1
-    end = 33
+    end = 2
     input = get_zk_input(0, start, end).strip('\"')
-    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
-        file.write(input)
-    logging.info('Input generated')
-    # write proof to solidity input file
-    if(compute_proof(0)):
-        # transfer proof to solidity acceptable format
-        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
-            with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
-                data = json.load(input)
-                result = {'start': start, 'end':end}
-                result['proof'] = {}
-                result['proof']['a'] = castStrListToHex(data["proof"]["a"])
-                result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
-                result['proof']['c'] = castStrListToHex(data["proof"]["c"])
-                result['proof']['inputs'] = castStrListToHex(data["inputs"])
-                file.write(json.dumps(result))
+    # with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
+    #     file.write(input)
+    # logging.info('Input generated')
+    # # write proof to solidity input file
+    # if(compute_proof(0)):
+    #     # transfer proof to solidity acceptable format
+    #     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
+    #         with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
+    #             data = json.load(input)
+    #             result = {'start': start, 'end':end}
+    #             result['proof'] = {}
+    #             result['proof']['a'] = castStrListToHex(data["proof"]["a"])
+    #             result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
+    #             result['proof']['c'] = castStrListToHex(data["proof"]["c"])
+    #             result['proof']['inputs'] = castStrListToHex(data["inputs"])
+    #             file.write(json.dumps(result))
 
 if(sys.argv[1] == 'bchproof'):
     start = 1

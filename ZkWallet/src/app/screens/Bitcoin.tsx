@@ -53,8 +53,7 @@ const Bitcoin = () => {
 
   const refreshData = () => {
     dispatch(getBalanceSummary(address));
-    dispatch(getInfo());
-    dispatch(getBtcHeaders(0, 3));
+    // dispatch(getInfo());
 
     // setup creadentials in prenament storage
     btcCreadentails.address = address;
@@ -122,7 +121,7 @@ const Bitcoin = () => {
         <Button
           title="Get headers"
           onPress={() => {
-            dispatch(getBtcHeaders(2, 4));
+            dispatch(getBtcHeaders(4, 6));
           }}
         />
       </ScrollView>

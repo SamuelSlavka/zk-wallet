@@ -1,35 +1,99 @@
+import '../../../shim';
+import '../utilities/global';
+global.Buffer = global.Buffer || require('buffer').Buffer;
+import crypto from 'crypto';
+
+// basic header structure
 export class BtcHeader {
   height: string;
-  unhexBits: string;
-  previous_block_hash: string = '';
+  previous_block_hash: string;
   version: string;
   merkle_root: string;
   timestamp: string;
   bits: string;
   nonce: string;
   hash: string;
-
+  // version+previous_block_hash + merkle_root+timestamp+bits+nonce
   constructor(
-    height: string,
-    unhexBits: string,
     version: string,
+    previous_block_hash: string,
     merkle_root: string,
     timestamp: string,
     bits: string,
     nonce: string,
+
+    height: string,
     hash: string,
   ) {
-    this.height = height;
-    this.unhexBits = unhexBits;
     this.version = version;
+    this.previous_block_hash = previous_block_hash;
     this.merkle_root = merkle_root;
     this.timestamp = timestamp;
     this.bits = bits;
     this.nonce = nonce;
+
+    this.height = height;
     this.hash = hash;
+  }
+
+  // changes endianness of hex string
+  reverseHex = (hexNum: string) => hexNum?.match(/../g)?.reverse().join('');
+
+  // return hash of header object
+  getHash(): string {
+    const parsedVersion = this.reverseHex(this.version) ?? '';
+    const parsedRoot = this.reverseHex(this.merkle_root) ?? '';
+    const parsedBits = this.reverseHex(this.bits) ?? '';
+    const parsedTime =
+      this.reverseHex(parseInt(this.timestamp, 10).toString(16)) ?? '';
+    const parsedNonce =
+      this.reverseHex(parseInt(this.nonce, 10).toString(16)) ?? '';
+    const parsedPrevBlock =
+      (this.previous_block_hash
+        ? this.reverseHex(this.previous_block_hash)
+        : '0'.repeat(64)) ?? '';
+
+    const header =
+      parsedVersion +
+      parsedPrevBlock +
+      parsedRoot +
+      parsedTime +
+      parsedBits +
+      parsedNonce;
+
+    const bufferHash = global.Buffer.from(header, 'hex');
+    const headerHash = crypto
+      .createHash('sha256')
+      .update(crypto.createHash('sha256').update(bufferHash).digest())
+      .digest('hex');
+
+    return this.reverseHex(headerHash) ?? '';
+  }
+
+  // check header validity and that it follows previous
+  checkValidity(inputPrevHash: string): boolean {
+    const head = parseInt(this.bits.substring(0, 2), 16);
+    const tail = parseInt(this.bits.substring(2), 16);
+    if (
+      // if actual hash is same as recieve
+      this.getHash() === this.hash &&
+      // if previous hash is actually previous
+      this.previous_block_hash === inputPrevHash &&
+      // if hash is smaller than difficulty (todo maybe the numbers are to big)
+      tail * Math.pow(2, 8 * (head - 3)) > parseInt(this.hash, 16)
+    ) {
+      return true;
+    }
+    return false;
   }
 }
 
+// mapping of validated headers
+export class ValidatedHeader {
+  [key: number]: string;
+}
+
+// payload structure for btc JRPC communication
 export class Payload {
   id: number;
   jsonrpc: string;
@@ -44,6 +108,7 @@ export class Payload {
   }
 }
 
+// basic transaction structure
 export class BtcTransaction {
   tx_hash: string;
   block_index: number;

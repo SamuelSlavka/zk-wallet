@@ -32,6 +32,7 @@ class BlockHeader:
         self.bits = hexify(input['bits'])
         
         self.nonce = hexify(format(input['nonce'], 'x').zfill(8))
+
     def __str__(self) -> str:
         return f'BlockHeader #{self.height} {self.hash}'
 
@@ -89,6 +90,7 @@ class BlockHeader:
         if self._hash is None:
             binHeader = self.header
             hash = sha256(sha256(binHeader).digest()).digest()
+            print(hash)
             hash = binascii.hexlify(hash)
             self._hash = binascii.hexlify(
                 binascii.unhexlify(hash)[::-1]).decode('ascii')

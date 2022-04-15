@@ -1,0 +1,8 @@
+export const BASE_URL = 'http://172.17.0.1';
+
+export const BTC_URL = 'https://btc.getblock.io/mainnet/';
+export const BCH_URL = 'https://bch.getblock.io/mainnet/';
+
+export const BTC_TOKEN = 'REPLACEME';
+
+export const BLOCKCHAIR_URL = 'https://api.blockchair.com';

@@ -36,6 +36,6 @@ def getBlockHeaders(chainId, begining, end):
     payload = json.dumps([getPayload(block, block, 'getblockhash') for block in range(begining, end)])
     response = requests.post(provider, headers=headers, data=payload, allow_redirects=False, timeout=30)
     # get block headers
-    payload = json.dumps([getPayload(block['id'], block['result'], 'getblock') for block in response.json()])
+    payload = json.dumps([getPayload(block['id'], block['result'], 'getblockheader') for block in response.json()])
     response = requests.post(provider, headers=headers, data=payload, allow_redirects=False, timeout=30).json()
     return response

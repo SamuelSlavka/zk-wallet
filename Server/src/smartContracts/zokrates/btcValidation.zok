@@ -43,18 +43,19 @@ def get_target(u32 bits) -> field:
     // length of teraget of hex
     u32 headInHex = (u32_from_bits(head)*2)-6
     // number of shifts to left of head
-    u32 shitCount = headInHex % 16
-    // aditional 16b 0 numbers to append
-    u32 additionalFields = (headInHex-shitCount) / 16
+    u32 shiftsCount = headInHex % 16
+    // aditional 64b numbers 0 to append
+    u32 additionalFields = (headInHex-shiftsCount) / 16
     // get num of bitwise shifts
-    shitCount = shitCount*4
+    shiftsCount = shiftsCount*4
     for u32 i in 0..64 do
-        inttail = (i < shitCount) ? inttail << 1: inttail
+        inttail = (i < shiftsCount) ? inttail << 1: inttail
     endfor
     
     bool[64] bTarget = u64_to_bits(inttail)
     // get resulting target and check if it is small enough for prefixing with 64 bits
-    bool[256] resTarget = (additionalFields == 3) ? [...bTarget, ...[false; (192)]] : [...[false; (64)], ...bTarget, ...[false; (128)]] 
+    // disregarding shifts of size 1 and 0 since its not going to happend in forseable future and saves us some porcesing power
+    bool[256] resTarget = (additionalFields == 3) ? [...bTarget, ...[false; (192)]] : [...[false; (64)], ...bTarget, ...[false; (128)]]
     
     field resTargetField = boolPack256(resTarget)
     return resTargetField
