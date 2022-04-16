@@ -17,13 +17,23 @@ const persistEthConfig = {
 const persistBtcConfig = {
   key: 'btc',
   storage: AsyncStorage,
-  whitelist: ['btcHeaders', 'btcCreadentails', 'btcValidHeaders'],
+  whitelist: [
+    'btcHeaders',
+    'btcCreadentails',
+    'btcValidHeaders',
+    'btcValidTransactions',
+  ],
 };
 
 const persistBchConfig = {
   key: 'bch',
   storage: AsyncStorage,
-  whitelist: ['bchHeaders', 'bchCreadentails', 'bchValidHeaders'],
+  whitelist: [
+    'bchHeaders',
+    'bchCreadentails',
+    'bchValidHeaders',
+    'bchValidTransactions',
+  ],
 };
 
 const rootReducer = combineReducers({

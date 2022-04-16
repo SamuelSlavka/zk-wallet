@@ -1,6 +1,10 @@
 import React from 'react';
 import {Text, SafeAreaView, StyleSheet, View, Alert} from 'react-native';
-import {BtcTransaction, ClosestHashParams} from '../redux/btcModels';
+import {
+  BtcTransaction,
+  ClosestHashParams,
+  ValidatedTransaction,
+} from '../redux/btcModels';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
 
@@ -8,6 +12,7 @@ import ButtonComponent from './ButtonComponent';
 
 type Props = {
   transactions: BtcTransaction[];
+  validTransactions: ValidatedTransaction;
   catchUp: (start: number, end: number) => void;
   getClosestHash: (input: ClosestHashParams) => void;
   validateTransaction: (
@@ -51,7 +56,9 @@ const TransactionsComponent = (props: Props) => {
   };
 
   const listItems = props.transactions.map((transaction: BtcTransaction) => {
-    const validated = transaction.validated?.toString();
+    const validated = props.validTransactions[transaction.tx_hash]
+      ? 'true'
+      : 'false';
     const spent = transaction.spending_tx_hash ? 'true' : 'false';
     const catchUpLength = props.closestHash.hash
       ? transaction.block_height - props.closestHash.height

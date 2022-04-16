@@ -85,6 +85,11 @@ export class ValidatedHeader {
   [key: number]: string;
 }
 
+// mapping of validated transactions
+export class ValidatedTransaction {
+  [hash: string]: boolean;
+}
+
 // payload structure for btc JRPC communication
 export class Payload {
   id: string;

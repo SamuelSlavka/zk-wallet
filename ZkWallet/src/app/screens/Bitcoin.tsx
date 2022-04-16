@@ -24,6 +24,7 @@ const Bitcoin = () => {
     btcTransactions,
     btcBalance,
     btcClosestHash,
+    btcValidTransactions,
   } = useSelector((state: RootState) => state.bitcoinReducer);
 
   const dispatch = useDispatch();
@@ -54,6 +55,7 @@ const Bitcoin = () => {
           catchUp={getBtcHeaders}
           validateTransaction={validateTransaction}
           closestHash={btcClosestHash}
+          validTransactions={btcValidTransactions}
           merkleRoot={
             btcHeaders.find(
               header => parseInt(header.height, 10) === btcClosestHash.height,
