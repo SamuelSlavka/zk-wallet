@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
     "start": "react-native start",
+    "postinstall": "rn-nodeify --install --hack --yarn ",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
@@ -39,6 +39,7 @@
     "https-browserify": "~0.0.0",
     "node-libs-browser": "^2.2.1",
     "path-browserify": "0.0.0",
+    "process": "^0.11.0",
     "punycode": "^1.2.4",
     "querystring-es3": "~0.2.0",
     "react": "17.0.2",

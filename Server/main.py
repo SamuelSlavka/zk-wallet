@@ -18,7 +18,7 @@ if(sys.argv[1] == 'compile'):
 
 if(sys.argv[1] == 'btcproof'):
     start = 1
-    end = 2
+    end = start+ 32
     input = get_zk_input(0, start, end).strip('\"')
     # with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
     #     file.write(input)
@@ -39,7 +39,7 @@ if(sys.argv[1] == 'btcproof'):
 
 if(sys.argv[1] == 'bchproof'):
     start = 1
-    end = 33
+    end = start+ 32
     input = get_zk_input(2, start, end).strip('\"')
     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBch', 'w') as file:
         file.write(input)

@@ -1,5 +1,5 @@
-import '../../../shim';
 import '../utilities/global';
+import '../../../shim';
 global.Buffer = global.Buffer || require('buffer').Buffer;
 import crypto from 'crypto';
 
@@ -41,32 +41,23 @@ export class BtcHeader {
 
   // return hash of header object
   getHash(): string {
-    const parsedVersion = this.reverseHex(this.version) ?? '';
-    const parsedRoot = this.reverseHex(this.merkle_root) ?? '';
-    const parsedBits = this.reverseHex(this.bits) ?? '';
-    const parsedTime =
-      this.reverseHex(parseInt(this.timestamp, 10).toString(16)) ?? '';
-    const parsedNonce =
-      this.reverseHex(parseInt(this.nonce, 10).toString(16)) ?? '';
-    const parsedPrevBlock =
-      (this.previous_block_hash
-        ? this.reverseHex(this.previous_block_hash)
-        : '0'.repeat(64)) ?? '';
-
     const header =
-      parsedVersion +
-      parsedPrevBlock +
-      parsedRoot +
-      parsedTime +
-      parsedBits +
-      parsedNonce;
-
+      (this.reverseHex(this.version) ?? '') +
+      ((this.previous_block_hash
+        ? this.reverseHex(this.previous_block_hash)
+        : '0'.repeat(64)) ?? '') +
+      (this.reverseHex(this.merkle_root) ?? '') +
+      (this.reverseHex(parseInt(this.timestamp, 10).toString(16)) ?? '') +
+      (this.reverseHex(this.bits) ?? '') +
+      (this.reverseHex(
+        parseInt(this.nonce, 10).toString(16).padStart(8, '0'),
+      ) ?? '');
+    console.log(header);
     const bufferHash = global.Buffer.from(header, 'hex');
     const headerHash = crypto
       .createHash('sha256')
       .update(crypto.createHash('sha256').update(bufferHash).digest())
       .digest('hex');
-
     return this.reverseHex(headerHash) ?? '';
   }
 
@@ -74,12 +65,16 @@ export class BtcHeader {
   checkValidity(inputPrevHash: string): boolean {
     const head = parseInt(this.bits.substring(0, 2), 16);
     const tail = parseInt(this.bits.substring(2), 16);
+    console.log(this.getHash(), this.hash, this.height);
+    console.log(this.getHash() === this.hash);
+    console.log(this.previous_block_hash === inputPrevHash);
+    console.log(tail * Math.pow(2, 8 * (head - 3)) > parseInt(this.hash, 16));
     if (
       // if actual hash is same as recieve
       this.getHash() === this.hash &&
       // if previous hash is actually previous
       this.previous_block_hash === inputPrevHash &&
-      // if hash is smaller than difficulty (todo maybe the numbers are to big)
+      // if hash is smaller than difficulty (todo maybe the numbers are to big for js)
       tail * Math.pow(2, 8 * (head - 3)) > parseInt(this.hash, 16)
     ) {
       return true;

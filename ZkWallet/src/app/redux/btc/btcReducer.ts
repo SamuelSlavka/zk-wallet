@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { GET_BTC_HEADERS, SET_BTC_CREDENTIALS, GET_BTC_TRANSACTIONS, GET_BTC_CLOSEST_HASH } from './btcActions';
 import { BtcHeader, BtcTransaction, ValidatedHeader } from '../btcModels';
-
+import '../../../../shim'
 
 const initialState = {
     btcBalance: 0 as number,
@@ -37,12 +37,12 @@ function btcReducer(state = initialState, action: any) {
         case GET_BTC_CLOSEST_HASH:
             const validHeaders = {
                     ...state.btcValidHeaders,
-                    [action.payload.height]: BigInt(action.payload.hash).toString(16),
+                    [action.payload.height]: BigInt(action.payload.hash).toString(16).padStart(64, '0'),
                 };
             // set it as closest hash
             var closestHash = {
                 hash: BigInt(action.payload.hash).toString(16),
-                height: action.payload.height,
+                height: parseInt(action.payload.height, 10),
             };
             // check if there is another validated header closer
             for (var i = action.payload.target; i > action.payload.height; i--){
@@ -81,7 +81,6 @@ function btcReducer(state = initialState, action: any) {
                 }
                 newHeaders.push(newHeader);
             });
-            console.log(state.btcValidHeaders);
             return { ...state, btcHeaders: newHeaders, btcValidHeaders: state.btcValidHeaders};
         default:
             return state;

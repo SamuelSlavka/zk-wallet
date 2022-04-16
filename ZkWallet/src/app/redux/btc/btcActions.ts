@@ -30,8 +30,10 @@ export const getClosestHash = ( params: ClosestHashParams )  => {
 };
 
 // catch up to given height with headers
-export const catchUp = ( start: number, end: number )  => {
-    console.log(start, end);
+export const validateTransaction = ( transactionHash: string, blockHeight: number )  => {
+    return async (dispatch: any) => {
+        console.log(transactionHash, blockHeight);
+    };
 };
 
 // save credentials to prenament storage

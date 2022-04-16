@@ -30,7 +30,7 @@ class BlockHeader:
         self.merkle_root = hexify(input['merkleroot'])
         self.timestamp = hexify(format(input['time'], 'x'))
         self.bits = hexify(input['bits'])
-        
+        # padding nonce to 8 chars
         self.nonce = hexify(format(input['nonce'], 'x').zfill(8))
 
     def __str__(self) -> str:

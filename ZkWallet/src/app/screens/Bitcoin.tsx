@@ -3,16 +3,14 @@ import {Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
 
-import {getClosestHash} from '../redux/btc/btcActions';
-import {ClosestHashParams} from '../redux/btcModels';
-
 import TransactionsComponent from '../components/TransactionsComponent';
 import ButtonComponent from '../components/ButtonComponent';
 
 import {
   getBtcHeaders,
   getBalanceSummary,
-  catchUp,
+  getClosestHash,
+  validateTransaction,
 } from '../redux/btc/btcActions';
 
 // import {getInfo} from '../redux/ethActions';
@@ -30,15 +28,11 @@ const Bitcoin = () => {
 
   const dispatch = useDispatch();
 
-  const refreshData = () => {
-    dispatch(getBalanceSummary(address));
+  useEffect(() => {
     // setup creadentials in prenament storage
     btcCreadentails.address = address;
     console.log(btcCreadentails.address);
-  };
-
-  useEffect(() => {
-    refreshData();
+    dispatch(getBalanceSummary(address));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,18 +50,15 @@ const Bitcoin = () => {
         <Text style={styles.header}>Your txses:</Text>
         <TransactionsComponent
           transactions={btcTransactions}
-          getHash={(input: ClosestHashParams) => {
-            getClosestHash(input);
-          }}
-          catchUp={(start: number, end: number) => {
-            catchUp(start, end);
-          }}
+          getClosestHash={getClosestHash}
+          catchUp={getBtcHeaders}
+          validateTransaction={validateTransaction}
           closestHash={btcClosestHash}
         />
         <ButtonComponent
           title="Refresh"
           callback={() => {
-            refreshData();
+            dispatch(getBalanceSummary(address));
           }}
         />
         <ButtonComponent

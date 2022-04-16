@@ -4,6 +4,9 @@ Eth interaction is done trought wrapper on top of Go.
 React native acceses this wrapper trough Native Modeule: `CommunucationNative`
 
 
+## setup
+    yarn install
+    yarn postinstall
 
 ## run app
     yarn react-native run-android

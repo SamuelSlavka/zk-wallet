@@ -12,8 +12,8 @@ contract HeaderList{
     constructor() {
         // init chain 0 with btc genesis
         setupChain(0, 0x00000000000000000002a6a5843409a1e07c20f2ad1047d07491e5b86ae09f03, 729300);
-        // init chain 1 with doge genesis
-        setupChain(1, 0x82bc68038f6034c0596b6e313729793a887fded6e92a31fbdf70863f89d9bea2, 1);
+        // init chain 1 with bch genesis
+        setupChain(1, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f, 1);
         // init chain 2 with bch genesis
         setupChain(2, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f, 1);
     }
@@ -32,7 +32,7 @@ contract HeaderList{
     }
 
     /// @dev Find fork contining hash at number or create a new one.
-    /// @param chainId id of current blockchain 0 - btc 1 - doge
+    /// @param chainId id of current blockchain 0 - btc 1 - bch
     /// @param prevHash Hash that we search for.
     /// @param number Start height.
     /// @return uint256 Fork Id.
@@ -61,7 +61,7 @@ contract HeaderList{
     event Log(string message, uint256 someNum);
 
     /// @dev Verifies array of batches and appedns them to storage.
-    /// @param chainId id of current blockchain 0 - btc 1 - doge
+    /// @param chainId id of current blockchain 0 - btc 1 - bch 
     /// @param inputs Array of inputs containing proof and zok argument.
     /// @param startHeight Start height og batch.
     /// @param endHeight End height of the batch.
@@ -130,7 +130,7 @@ contract HeaderList{
     event ClosestHash(uint256);
 
     /// @dev Returns closest hash to given height.
-    /// @param chainId id of current blockchain 0 - btc 1 - doge
+    /// @param chainId id of current blockchain 0 - btc 1 - bch
     /// @param height Requested block height in blockchain.
     /// @param forkNumber Forknumber to search in initially should be 0.
     /// @return uint256[] - Closest block hash and its height.

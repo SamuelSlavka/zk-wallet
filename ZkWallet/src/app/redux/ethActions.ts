@@ -3,30 +3,6 @@ import {NativeModules} from 'react-native';
 
 import {BASE_URL} from '../config';
 
-export const getClosestHash = (
-  blockchainId: number,
-  password: string,
-  contractAddress: string,
-  abi: string,
-  target: number,
-) => {
-  return async (dispatch: any) => {
-    NativeModules.CommunicationNative.getClosestHash(
-      blockchainId,
-      password,
-      contractAddress,
-      abi,
-      target,
-      (str: any) => {
-        dispatch({
-          type: GET_CLOSEST_HASH,
-          payload: str,
-        });
-      },
-    );
-  };
-};
-
 export const sendTransaction = (
   password: string,
   receiverAddress: string,
@@ -150,5 +126,4 @@ export const NEW_ETH_ACCOUNT = 'NEW_ETH_ACCOUNT';
 export const LOAD_ETH_ACCOUNT = 'LOAD_ETH_ACCOUNT';
 export const GET_ETH_ADDRESS = 'GET_ETH_ADDRESS';
 export const GET_CONTRACT_INFO = 'GET_CONTRACT_INFO';
-export const GET_CLOSEST_HASH = 'GET_CLOSEST_HASH';
 export const TRANSACTION_SENT = 'TRANSACTION_SENT';
