@@ -10,8 +10,13 @@ type Props = {
   transactions: BtcTransaction[];
   catchUp: (start: number, end: number) => void;
   getClosestHash: (input: ClosestHashParams) => void;
-  validateTransaction: (transactionHash: string, blockHeight: number) => void;
+  validateTransaction: (
+    transactionHash: string,
+    blockHeight: number,
+    merkleRoot: string,
+  ) => void;
   closestHash: {hash: string; height: number};
+  merkleRoot: string;
 };
 
 const TransactionsComponent = (props: Props) => {
@@ -80,6 +85,7 @@ const TransactionsComponent = (props: Props) => {
             props.validateTransaction(
               transaction.tx_hash,
               transaction.block_height,
+              props.merkleRoot,
             ),
           )
         }

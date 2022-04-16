@@ -1,4 +1,5 @@
 import '../utilities/global';
+import {reverseHex} from '../utilities/utils';
 import '../../../shim';
 global.Buffer = global.Buffer || require('buffer').Buffer;
 import crypto from 'crypto';
@@ -36,29 +37,25 @@ export class BtcHeader {
     this.hash = hash;
   }
 
-  // changes endianness of hex string
-  reverseHex = (hexNum: string) => hexNum?.match(/../g)?.reverse().join('');
-
   // return hash of header object
   getHash(): string {
     const header =
-      (this.reverseHex(this.version) ?? '') +
+      (reverseHex(this.version) ?? '') +
       ((this.previous_block_hash
-        ? this.reverseHex(this.previous_block_hash)
+        ? reverseHex(this.previous_block_hash)
         : '0'.repeat(64)) ?? '') +
-      (this.reverseHex(this.merkle_root) ?? '') +
-      (this.reverseHex(parseInt(this.timestamp, 10).toString(16)) ?? '') +
-      (this.reverseHex(this.bits) ?? '') +
-      (this.reverseHex(
-        parseInt(this.nonce, 10).toString(16).padStart(8, '0'),
-      ) ?? '');
+      (reverseHex(this.merkle_root) ?? '') +
+      (reverseHex(parseInt(this.timestamp, 10).toString(16)) ?? '') +
+      (reverseHex(this.bits) ?? '') +
+      (reverseHex(parseInt(this.nonce, 10).toString(16).padStart(8, '0')) ??
+        '');
     console.log(header);
     const bufferHash = global.Buffer.from(header, 'hex');
     const headerHash = crypto
       .createHash('sha256')
       .update(crypto.createHash('sha256').update(bufferHash).digest())
       .digest('hex');
-    return this.reverseHex(headerHash) ?? '';
+    return reverseHex(headerHash) ?? '';
   }
 
   // check header validity and that it follows previous
@@ -90,12 +87,12 @@ export class ValidatedHeader {
 
 // payload structure for btc JRPC communication
 export class Payload {
-  id: number;
+  id: string;
   jsonrpc: string;
   method: string;
-  params: number[];
+  params: any[];
 
-  constructor(id: number, params: number[], method: string) {
+  constructor(id: string, params: any[], method: string) {
     this.id = id;
     this.jsonrpc = '2.0';
     this.method = method;

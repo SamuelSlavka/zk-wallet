@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
 import { NativeModules } from 'react-native';
+import { reverseHex } from '../../utilities/utils';
 import { BTC_TOKEN, BLOCKCHAIR_URL, BTC_URL } from '../../config';
 import { Payload, ClosestHashParams } from '../btcModels';
+import '../../../../shim';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -29,11 +31,53 @@ export const getClosestHash = ( params: ClosestHashParams )  => {
     };
 };
 
+// parse raw proof to hashes
+const parseProof = (proof: string): {hashCount: number, hashes: string[], flags: number[]} => {
+    // const header = reverseHex(proof.substring(160));
+    // const txCount = parseInt(reverseHex(proof.substring(160, 168)) ?? '', 16);
+    const hashCount = parseInt(reverseHex(proof.substring(168,170)) ?? '', 16);
+    const hashes = [];
+    for (let i = 0; i < hashCount; i++) {
+        hashes.push( proof.substring(170 + i * 64, 234 + i * 64 ));
+    }
+    const pos = 170 + (hashCount) * 64;
+    const flagBits = parseInt(reverseHex(proof.substring(pos,pos + 2)) ?? '', 16);
+    const flags = [];
+    for (let i = 0; i < flagBits; i++) {
+        flags.push( parseInt(reverseHex(proof.substring(pos + 2 + i * 2, pos + 4 + i * 2 )) ?? '', 16) );
+    }
+    return {hashCount, hashes, flags};
+};
+
 // catch up to given height with headers
-export const validateTransaction = ( transactionHash: string, blockHeight: number )  => {
-    return async (dispatch: any) => {
-        console.log(transactionHash, blockHeight);
-    };
+export const validateTransaction = ( transactionHash: string, blockHeight: number, merkleRoot: string )  => {
+    const payload = new Payload('gettxoutproof', [[transactionHash], null], 'gettxoutproof');
+    axios({
+        method: 'post',
+        url: BTC_URL,
+        headers: headers,
+        data: payload,
+    })
+    .then(res => {
+        var parsedProof = parseProof(res.data.result);
+        const partialTree = parsedProof.hashes.map((x:any) => new Buffer(x,'hex'));
+
+        var bmp = require('bitcoin-merkle-proof');
+        var merkleProof = bmp.build({
+            hashes: partialTree,
+            include: [reverseHex(transactionHash) ?? ''],
+            numTransactions: parsedProof.hashCount,
+            merkleRoot: new Buffer((reverseHex(merkleRoot) ?? ''), 'hex'),
+            flags: parsedProof.flags,
+            });
+        // returns included hashshes and throws error on invalid
+        var hashes = bmp.verify(merkleProof);
+        console.log(hashes[0].toString('hex') === reverseHex(transactionHash));
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
 };
 
 // save credentials to prenament storage
@@ -70,7 +114,7 @@ export const getBalanceSummary = (address: string) => {
 export const getBtcHeaders = (begining: number, end: number) => {
     const blockNumbers: Payload[] = [];
     for (let i = begining; i < end; i++) {
-        blockNumbers.push(new Payload(i, [i], 'getblockhash'));
+        blockNumbers.push(new Payload(i.toString(), [i], 'getblockhash'));
     }
     return async (dispatch: any) => {
         // get header hashes by their numbers

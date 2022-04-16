@@ -54,6 +54,11 @@ const Bitcoin = () => {
           catchUp={getBtcHeaders}
           validateTransaction={validateTransaction}
           closestHash={btcClosestHash}
+          merkleRoot={
+            btcHeaders.find(
+              header => parseInt(header.height, 10) === btcClosestHash.height,
+            )?.merkle_root ?? ''
+          }
         />
         <ButtonComponent
           title="Refresh"
