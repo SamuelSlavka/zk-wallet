@@ -49,7 +49,6 @@ export class BtcHeader {
       (reverseHex(this.bits) ?? '') +
       (reverseHex(parseInt(this.nonce, 10).toString(16).padStart(8, '0')) ??
         '');
-    console.log(header);
     const bufferHash = global.Buffer.from(header, 'hex');
     const headerHash = crypto
       .createHash('sha256')
@@ -62,10 +61,6 @@ export class BtcHeader {
   checkValidity(inputPrevHash: string): boolean {
     const head = parseInt(this.bits.substring(0, 2), 16);
     const tail = parseInt(this.bits.substring(2), 16);
-    console.log(this.getHash(), this.hash, this.height);
-    console.log(this.getHash() === this.hash);
-    console.log(this.previous_block_hash === inputPrevHash);
-    console.log(tail * Math.pow(2, 8 * (head - 3)) > parseInt(this.hash, 16));
     if (
       // if actual hash is same as recieve
       this.getHash() === this.hash &&

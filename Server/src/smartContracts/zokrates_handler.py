@@ -40,7 +40,9 @@ def compute_proof(chainId):
     try:
         init_zokrates(working_directory)
         logging.info('Zokratres initiated')
-        input = '/zokratesInputBch' if chainId == 2 else '/zokratesInputBtc'
+        
+        input = '/zokratesInputBch' if (chainId == 2 or chainId == 3) else '/zokratesInputBtc'
+
         with open(working_directory + input, 'r') as file:
             data = file.read().rstrip()
             subprocess.run('zokrates compute-witness -a ' + data, shell=True, cwd=working_directory)

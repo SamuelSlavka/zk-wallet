@@ -20,9 +20,12 @@ def getBlockHeaders(chainId, begining, end):
         token = BTCTOKEN
         provider = BTCPROVIDER
     if (chainId == 1):
-        token = DOGETOKEN
-        provider = DOGEPROVIDER
+        token = BTCTOKEN
+        provider = BTCPROVIDER
     if (chainId == 2):
+        token = BCHTOKEN
+        provider = BCHPROVIDER
+    if (chainId == 3):
         token = BCHTOKEN
         provider = BCHPROVIDER
 

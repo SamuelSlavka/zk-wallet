@@ -15,23 +15,19 @@ type Props = {
   validTransactions: ValidatedTransaction;
   catchUp: (start: number, end: number) => void;
   getClosestHash: (input: ClosestHashParams) => void;
-  validateTransaction: (
-    transactionHash: string,
-    blockHeight: number,
-    merkleRoot: string,
-  ) => void;
+  validateTransaction: (transactionHash: string, merkleRoot: string) => void;
   closestHash: {hash: string; height: number};
   merkleRoot: string;
+  chainId: number;
 };
 
 const TransactionsComponent = (props: Props) => {
   const dispatch = useDispatch();
   const {contract} = useSelector((state: RootState) => state.ethereumReducer);
-
   // return closest hash ti height
   const getHashparams = (password: string, height: number) =>
     new ClosestHashParams(
-      0,
+      props.chainId,
       password,
       contract.contract_address,
       JSON.stringify(contract.abi),
@@ -70,7 +66,6 @@ const TransactionsComponent = (props: Props) => {
         title="Catch up"
         contents={catchUpLength.toString() + ' blocks'}
         callback={() => {
-          console.log(catchUpLength);
           if (catchUpLength > 200) {
             showAlert(catchUpLength);
           } else {
@@ -89,11 +84,7 @@ const TransactionsComponent = (props: Props) => {
         title="Validate"
         callback={() =>
           dispatch(
-            props.validateTransaction(
-              transaction.tx_hash,
-              transaction.block_height,
-              props.merkleRoot,
-            ),
+            props.validateTransaction(transaction.tx_hash, props.merkleRoot),
           )
         }
       />

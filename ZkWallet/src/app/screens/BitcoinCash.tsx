@@ -14,6 +14,7 @@ import {
 } from '../redux/bch/bchActions';
 
 const address = 'qrn29uc480r8ra8yvfyuzr35dhrs776hgye0fqpnem';
+const chainId = 3;
 
 const BitcoinCash = () => {
   const {
@@ -59,6 +60,7 @@ const BitcoinCash = () => {
               header => parseInt(header.height, 10) === bchClosestHash.height,
             )?.merkle_root ?? ''
           }
+          chainId={chainId}
         />
         <ButtonComponent
           title="Refresh"

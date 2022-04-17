@@ -102,9 +102,9 @@ def send_batches_to_contract(blockchainId, account, w3, contract_address, abi):
             logging.info('Proof loaded')
             try:
                 nonce = w3.eth.getTransactionCount(account.address)
+                logging.info('Building transaction...')
                 transaction = contract.functions.submitBatches(
                     blockchainId, [input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
-                logging.info('nonce')
                 signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
                 logging.info('Transaction created')
                 tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)

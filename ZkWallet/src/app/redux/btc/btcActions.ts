@@ -33,7 +33,6 @@ export const getClosestHash = (params: ClosestHashParams) => {
 // catch up to given height with headers
 export const validateTransaction = (
   transactionHash: string,
-  blockHeight: number,
   merkleRoot: string,
 ) => {
   return async (dispatch: any) => {

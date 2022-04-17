@@ -16,6 +16,7 @@ import {
 // import {getInfo} from '../redux/ethActions';
 
 const address = '37Q13UiqZz4mkyuumyzKifSdApa5Bk3TV5';
+const chainId = 0;
 
 const Bitcoin = () => {
   const {
@@ -61,6 +62,7 @@ const Bitcoin = () => {
               header => parseInt(header.height, 10) === btcClosestHash.height,
             )?.merkle_root ?? ''
           }
+          chainId={chainId}
         />
         <ButtonComponent
           title="Refresh"

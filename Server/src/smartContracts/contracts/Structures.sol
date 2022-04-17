@@ -39,5 +39,5 @@ pragma experimental ABIEncoderV2;
         uint[2] a;
         uint[2][2] b;
         uint[2] c;
-        uint256[12] inputs;
+        uint256[8] inputs;
     }

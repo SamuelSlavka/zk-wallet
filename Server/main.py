@@ -1,5 +1,6 @@
 from src.smartContracts.contract_handler import build_and_deploy, send_batches_to_contract, get_closest_hash
 from src.smartContracts.zokrates_handler import compile_validator, compute_proof
+from src.smartContracts.contract_debugger import run_debugger
 from src.ethereum.ethereum import init_eth_with_pk
 from src.bitcoin.bitcoin import get_zk_input
 from src.constants import *
@@ -20,22 +21,22 @@ if(sys.argv[1] == 'btcproof'):
     start = 1
     end = start+ 32
     input = get_zk_input(0, start, end).strip('\"')
-    # with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
-    #     file.write(input)
-    # logging.info('Input generated')
-    # # write proof to solidity input file
-    # if(compute_proof(0)):
-    #     # transfer proof to solidity acceptable format
-    #     with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
-    #         with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
-    #             data = json.load(input)
-    #             result = {'start': start, 'end':end}
-    #             result['proof'] = {}
-    #             result['proof']['a'] = castStrListToHex(data["proof"]["a"])
-    #             result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
-    #             result['proof']['c'] = castStrListToHex(data["proof"]["c"])
-    #             result['proof']['inputs'] = castStrListToHex(data["inputs"])
-    #             file.write(json.dumps(result))
+    with open(os.getcwd()+'/Server/src/smartContracts/zokrates/zokratesInputBtc', 'w') as file:
+        file.write(input)
+    logging.info('Input generated')
+    # write proof to solidity input file
+    if(compute_proof(0)):
+        # transfer proof to solidity acceptable format
+        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/proof.json', 'r') as input:
+            with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'w') as file:
+                data = json.load(input)
+                result = {'start': start, 'end':end}
+                result['proof'] = {}
+                result['proof']['a'] = castStrListToHex(data["proof"]["a"])
+                result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
+                result['proof']['c'] = castStrListToHex(data["proof"]["c"])
+                result['proof']['inputs'] = castStrListToHex(data["inputs"])
+                file.write(json.dumps(result))
 
 if(sys.argv[1] == 'bchproof'):
     start = 1
@@ -102,3 +103,6 @@ if(sys.argv[1] == 'call'):
                 acc, web3, contract['contract_address'], contract['abi'], 90)
     else:
         logging.info("could not connect to web3")
+
+if(sys.argv[1] == 'debug'):
+    run_debugger()

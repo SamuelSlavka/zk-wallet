@@ -39,3 +39,7 @@ deploy:
 # call contract method default btc
 call:
 	python3 ./Server/main.py call
+
+# run contract debugger
+debug:
+	python3 ./Server/main.py debug

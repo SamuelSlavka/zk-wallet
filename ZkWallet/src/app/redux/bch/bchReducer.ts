@@ -107,7 +107,6 @@ function bchReducer(state = initialState, action: any) {
         const prevHash =
           state.bchValidHeaders[parseInt(newHeader.height, 10) - 1];
         if (prevHash && newHeader.checkValidity(prevHash)) {
-          console.log('got here');
           const hash1 = newHeader.getHash();
           state.bchValidHeaders[parseInt(newHeader.height, 10)] = hash1;
         }
