@@ -28,12 +28,7 @@ const persistBtcConfig = {
 const persistBchConfig = {
   key: 'bch',
   storage: AsyncStorage,
-  whitelist: [
-    'bchHeaders',
-    'bchCreadentails',
-    'bchValidHeaders',
-    'bchValidTransactions',
-  ],
+  whitelist: ['bchHeaders', 'bchCreadentails'],
 };
 
 const rootReducer = combineReducers({

@@ -1,28 +1,13 @@
 # Server side
 
-Smart contract architexture:
-1) `submitBatches(batches)`
-2) `for proof, input in batches verifyBatch(proof, input)`
+### Setup instructions:
+#### rename  `constants.dist.py` to  `constants.py`
 
-    `batch = batches.sum()`
-    
-3) `findFork(prevHash, height)`:
+      `PRIVATE_KEY` = Ethereum privateky from your chosen network with enought eth for contract deployment and interactions.
 
-    - `if(fork == mainFork && fork.forkHeight == batch.height):`
+      Replace Tokens and optionaly api urls.
 
-          batch.cumDiff = mainFork.batches[forkHeight] + batch.cumDiff`
-          mainFork.append(batch);`
-          mainFork.forkHeight = batch.height
-
-    - `if(fork != mainFork && fork.forkHeight == batch.height):`
-
-          batch.cumDiff = mainFork.batches[forkHeight] + batch.cumDiff
-          fork.append(batch);
-          fork.updateDiffHeight(batch);
-          chainUpdateMain(fork)
-
-    - `if(fork.forkHeight != batch.height):`
-
-          batch.cumDiff = batch.cumDiff + fork.batches[batch.height - 1]
-          newFork = Fork( prevFork: fork, preHeight: batch.height - 1, batches: [batch], forkHeight: batch.height)
-          chain.forks.append(newFork)
+#### for ganache add the following at the end
+      # ganache
+      PRIVATE_KEY = PK you get from ganache directly
+      ETHPROVIDER = 'HTTP://127.0.0.1:7545'

@@ -25,46 +25,6 @@ services:
       - server
     networks:
       - app-network
-    
-  ethereum-geth:
-    build:
-      context: ./Geth
-      dockerfile: Dockerfile
-    user: "$USER:$GROUP"
-    networks:
-      - app-network
-    volumes:
-      - ./Geth:/home/aladdin/.ethereum
-      - '/etc/passwd:/etc/passwd:ro'
-      - '/etc/group:/etc/group:ro'
-    ports:
-      # HTTP server / GraphQL API
-      - 8545:8545
-      # WebSocket
-      - 8546:8546
-      # Network listening port (P2P networking)
-      - 30303:30303
-    command:
-      [
-        "--syncmode=light",
-        # Megabytes of memory allocated to internal caching
-        "--cache=8192",
-        "--ws",
-        "--ws.addr=0.0.0.0",
-        "--http",
-        "--http.addr=0.0.0.0",
-        "--http.vhosts=*",
-        "--graphql",
-        "--graphql.vhosts=*",
-        # Enable metrics collection and reporting
-        "--metrics",
-        # Ethereum network
-        "--ropsten",
-        # Maximum number of network peers (network disabled if set to 0) (default: 50)
-        "--maxpeers=50",
-        # Data directory for the databases and keystore (default: "/root/.ethereum")
-        "--datadir=/home/aladdin/.ethereum"
-      ]
 
 networks:
   app-network:

@@ -10,3 +10,5 @@ witness
 verifier.sol
 zokratesInput
 smartContractInfo
+cache
+artifacts

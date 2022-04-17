@@ -8,6 +8,11 @@ React native acceses this wrapper trough Native Modeule: `CommunucationNative`
     yarn install
     yarn postinstall
 
+
+#### rename  `index.ts.dist` to  `index.ts`
+    Replace Token and optionaly api urls
+    BTC_TOKEN is token from getblock.io for their API
+
 ## run app
     yarn react-native run-android
 

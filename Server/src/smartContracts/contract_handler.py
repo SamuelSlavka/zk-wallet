@@ -49,14 +49,6 @@ def deploy_contract(contractInterface, account, w3):
         gasPrice = w3.eth.generate_gas_price() * gasMultiplier
         logging.info('GasPrice: ' + str(gasPrice))
 
-        # estimate gas maybe not necessary
-        # estgas = contract.constructor().estimateGas({
-        #     'from': account.address,
-        #     'nonce': w3.eth.getTransactionCount(account.address),
-        #     'gas': 20000000,
-        #     'gasPrice': gasPrice}) * gasMultiplier
-        # logging.info('Estgas: ' + str(estgas))
-
         # build contract creation transaction
         construct_txn = contract.constructor().buildTransaction({
             'from': account.address,

@@ -1,5 +1,4 @@
 import {
-  GET_ETH_ZKINPUT,
   GET_ETH_BALANCE,
   NEW_ETH_ACCOUNT,
   LOAD_ETH_ACCOUNT,
@@ -9,7 +8,6 @@ import {
 } from './ethActions';
 
 const initialState = {
-  input: '' as string,
   ethBalance: '' as string,
   keyfile: '' as string,
   ethAddress: '' as string,
@@ -19,8 +17,6 @@ const initialState = {
 
 function ethReducer(state = initialState, action: any) {
   switch (action.type) {
-    case GET_ETH_ZKINPUT:
-      return {...state, input: action.payload};
     case GET_CONTRACT_INFO:
       return {...state, contract: action.payload};
     case GET_ETH_BALANCE:

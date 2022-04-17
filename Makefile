@@ -10,7 +10,7 @@ init:
 
 # start dev enviroment
 dev:
-	docker-compose -f docker-compose-blockchainless.yml up --remove-orphans
+	docker-compose -f docker-compose.yml up --remove-orphans
 
 # compile and setup zokrates
 compile:

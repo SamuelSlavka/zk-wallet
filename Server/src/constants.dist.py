@@ -1,9 +1,3 @@
-SECRET_KEY='postgres'
-HOST='postgres'
-DATABASE='postgres'
-USER='postgres'
-PASSWORD='postgres'
-
 PRIVATE_KEY='REPLACEME'
 
 #ETH
@@ -15,6 +9,6 @@ ETHGRAPH='https://ethshared.bdnodes.net/graphql'
 BTCTOKEN='REPLACEME'
 BTCPROVIDER='https://btccore-main.bdnodes.net'
 
-#ZEC
-ZECPROVIDER='https://zec.getblock.io/mainnet/'
-ZECKEY='REPLACEME'
+#BCH
+BCHTOKEN='REPLACEME'
+BCHPROVIDER='https://bch.getblock.io/mainnet/'
