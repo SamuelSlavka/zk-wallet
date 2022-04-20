@@ -14,15 +14,19 @@ const persistEthConfig = {
   whitelist: ['keyfile', 'contract', 'closestHash'],
 };
 
-const persistBtcConfig = {
-  key: 'btc',
-  storage: AsyncStorage,
+/* in production use this whitlist
   whitelist: [
     'btcHeaders',
     'btcCreadentails',
     'btcValidHeaders',
     'btcValidTransactions',
   ],
+*/
+
+const persistBtcConfig = {
+  key: 'btc',
+  storage: AsyncStorage,
+  whitelist: ['btcHeaders', 'btcCreadentails'],
 };
 
 const persistBchConfig = {

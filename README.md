@@ -3,22 +3,29 @@
 ### A client-server framework for mobile wallet that will utilize zk-SNARKs as a storage optimization technique.
 
 ## Initial setup
+
 For each file ending with `.dist` create file with the same name with the same contents, but without `.dist` ending. Afterwadrs replace all `REPLACEME` values with your prefered configuration.
 It is more consisely described in respective READMEs
 
 ## Server setup
+
 Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary.
 #### build docker and compile zokratess program
+
     make init
+
 #### run dockerized flask
+
     make dev
 
 ## Smart contracts setup
-#### compile and setup zokrates
+#### compile and setup zokrates (warning creates toxic waste)
+
     make compile
 
 #### deploy current vesion of smart contract in smartContracts/build/contracts
 Uses validator created in `make compile`
+
     make deploy 
 
 Compilation is heavily dependant on number of headers in batches with proportional increase in ram:
@@ -26,8 +33,10 @@ Compilation is heavily dependant on number of headers in batches with proportion
 - 32 headers ~15GB ram local setup time: 40 minutes
 - 64 headers >30GB ram failed
 
-#### create proof for current smartContracts/zokrates/zokratesInput file and send to contract
-    make btcproof
+#### create proof default for btc headers 0 to 32 and send it to contract 
+
+    make proof
+
     make interact
 
 Witness generation:
@@ -37,11 +46,20 @@ Witness generation:
 Proof generation
 - 32 headers ~10GB ram time: 6:30s
 
+#### csutom proof creation run `main.py` with args `proof [blockchainId] [start height] [end height]` 
+blockchain ids are constants set in smart contracts:
+    0 - btc strting in genesis  
+    1 - btc starting in some test block
+    2 - bch starting in genesis
+    3 - bch strting in some test block
+
+#### custom interaction run `main.py` with args `interact [blockchainId] [start height] [end height]` 
 
 
 ## Client setup
   Fully described in ZkWallet
   
     yarn react-native start
+
     yarn react-native run
 

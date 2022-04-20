@@ -43,7 +43,7 @@ def deploy_contract(contractInterface, account, w3):
 
         # magic number to enable testnet interaction
         # remove if this ever gets to production!!
-        gasMultiplier = 5
+        gasMultiplier = 6
 
         # get gas
         gasPrice = w3.eth.generate_gas_price() * gasMultiplier
@@ -82,21 +82,28 @@ def build_and_deploy(account, w3):
     return False
 
 
-def send_batches_to_contract(blockchainId, account, w3, contract_address, abi):
+def send_batches_to_contract(blockchainId, start, end, account, w3, contract_address, abi):
     """ Send inputs to contract method """
     if(w3.isConnected()):
         contract = w3.eth.contract(
             address=contract_address,
             abi=abi
         )
-        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidityInput', 'r') as file:
+        start = str(start)
+        end = str(end)
+        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidity'+ blockchainId + start + end, 'r') as file:
             input = json.load(file)
             logging.info('Proof loaded')
             try:
+                gasMultiplier = 3
+                # get gas
+                gasPrice = w3.eth.generate_gas_price() * gasMultiplier
+                logging.info('GasPrice: ' + str(gasPrice))
+
                 nonce = w3.eth.getTransactionCount(account.address)
                 logging.info('Building transaction...')
                 transaction = contract.functions.submitBatches(
-                    blockchainId, [input["proof"]], input["start"], input["end"]).buildTransaction({'nonce': nonce})
+                    int(blockchainId), [input["proof"]], int(input["start"]), int(input["end"])).buildTransaction({'nonce': nonce, 'gasPrice': gasPrice})
                 signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
                 logging.info('Transaction created')
                 tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)

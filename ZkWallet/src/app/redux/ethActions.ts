@@ -80,26 +80,6 @@ export const loadAccount = (
   };
 };
 
-export const getZkInput = () => {
-  return async (dispatch: any) => {
-    axios
-      .get(`${BASE_URL}/btc`)
-      .then(function (response) {
-        if (response.data) {
-          dispatch({
-            type: GET_ETH_ZKINPUT,
-            payload: response.data,
-          });
-        } else {
-          console.log('Unable to fetch data from the API BASE URL!');
-        }
-      })
-      .catch(function (error: any) {
-        console.warn(error);
-      });
-  };
-};
-
 export const getInfo = () => {
   return async (dispatch: any) => {
     axios
@@ -120,7 +100,6 @@ export const getInfo = () => {
   };
 };
 
-export const GET_ETH_ZKINPUT = 'GET_ETH_ZKINPUT';
 export const GET_ETH_BALANCE = 'GET_ETH_BALANCE';
 export const NEW_ETH_ACCOUNT = 'NEW_ETH_ACCOUNT';
 export const LOAD_ETH_ACCOUNT = 'LOAD_ETH_ACCOUNT';

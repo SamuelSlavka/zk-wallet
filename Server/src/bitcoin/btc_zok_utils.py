@@ -7,8 +7,8 @@ import logging
 def create_zok_input(chainId, start, end):
     """ Get zok input for blocks """
     try:
-        firstHeader = getBlockHeaders(chainId, start-1,start)
-        headers = getBlockHeaders(chainId, start, end)
+        firstHeader = getBlockHeaders(int(chainId), int(start)-1,int(start))
+        headers = getBlockHeaders(int(chainId), int(start), int(end))
         zkHeaders = ''
         zkHashaes = ''
         for header in headers:

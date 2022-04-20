@@ -3,10 +3,13 @@
 ganache-2.5.4-linux-x86_64.AppImage
 out
 abi.json
-proof.json
+proof*
+witness*
+solidity*
 proving.key
 verification.key
-witness
+witenss*
+zokrates*
 verifier.sol
 zokratesInput
 smartContractInfo

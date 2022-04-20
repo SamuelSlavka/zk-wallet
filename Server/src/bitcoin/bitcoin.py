@@ -7,6 +7,8 @@ from ..constants import *
 
 def get_zk_input(chainId, start, end):
     try:
+        start = str(start)
+        end = str(end)
         zkInput = create_zok_input(chainId, start, end)
         return json.dumps(zkInput)
     except Exception as err:

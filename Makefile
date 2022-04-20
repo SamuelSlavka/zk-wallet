@@ -20,17 +20,17 @@ compile:
 btcproof:
 	python3 ./Server/main.py btcproof
 
-# create bch proof
-bchproof:
-	python3 ./Server/main.py bchproof
+# create proof
+proof:
+	python3 ./Server/main.py proof 0 1 33
 
 # interact with smart contract
 btcinteract:
 	python3 ./Server/main.py btcinteract
 
 # interact with smart contract
-bchinteract:
-	python3 ./Server/main.py bchinteract
+interact:
+	python3 ./Server/main.py interact 0 1 33
 
 # deploy smart contracts
 deploy:
