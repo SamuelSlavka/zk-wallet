@@ -52,7 +52,7 @@ def compute_proof(chainId, start, end):
             data = file.read().rstrip()
             subprocess.run('zokrates compute-witness -a ' + data + ' -o ' + witenessPath, shell=True, cwd=working_directory)
             logging.info('Witness created')
-            subprocess.run('zokrates generate-proof -j '+ proofPath , shell=True, cwd=working_directory)
+            subprocess.run('zokrates generate-proof -j '+ proofPath + ' -w ' + witenessPath , shell=True, cwd=working_directory)
             logging.info('Proof created')
         return True
     except Exception as err:
@@ -80,7 +80,7 @@ def create_proof_for_chain(chainId, start, end):
         with open(working_directory + '/proof'+chainId+start+end, 'r') as input:
             with open(working_directory + '/solidity'+chainId+start+end, 'w') as file:
                 data = json.load(input)
-                result = {'start': start, 'end':end}
+                result = {'start': int(start), 'end':int(end)}
                 result['proof'] = {}
                 result['proof']['a'] = castStrListToHex(data["proof"]["a"])
                 result['proof']['b'] = castNestedStrListToHex(data["proof"]["b"])
