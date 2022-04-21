@@ -51,30 +51,6 @@ if(sys.argv[1] == 'interact'):
     else:
         logging.info("could not connect to web3")
 
-if(sys.argv[1] == 'btcinteract'):
-    web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
-    acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
-    if(web3.isConnected()):
-        with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
-            contract = json.load(file)
-            # sends batches to bitcoin blockchain in contract
-            result = send_batches_to_contract(
-                0, start, end, acc, web3, contract['contract_address'], contract['abi'])
-    else:
-        logging.info("could not connect to web3")
-
-if(sys.argv[1] == 'bchinteract'):
-    web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
-    acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
-    if(web3.isConnected()):
-        with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'r') as file:
-            contract = json.load(file)
-            # sends batches to bitcoin blockchain in contract
-            result = send_batches_to_contract(
-                2, start, end, acc, web3, contract['contract_address'], contract['abi'])
-    else:
-        logging.info("could not connect to web3")
-
 if(sys.argv[1] == 'call'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
     acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)

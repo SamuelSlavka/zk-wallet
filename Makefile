@@ -16,30 +16,22 @@ dev:
 compile:
 	python3 ./Server/main.py compile
 
-# create btc proof
-btcproof:
-	python3 ./Server/main.py btcproof
-
-# create proof
-proof:
-	python3 ./Server/main.py proof 0 1 33
-
-# interact with smart contract
-btcinteract:
-	python3 ./Server/main.py btcinteract
-
-# interact with smart contract
-interact:
-	python3 ./Server/main.py interact 0 1 33
-
 # deploy smart contracts
 deploy:
 	python3 ./Server/main.py deploy
 
-# call contract method default btc
+# create btc proof headers 0 to 32
+proof:
+	python3 ./Server/main.py proof 0 1 33
+
+# interact with smart contract publishing proof of btc headers 0 to 32
+interact:
+	python3 ./Server/main.py interact 0 1 33
+
+# call contract get closest header method for btc
 call:
 	python3 ./Server/main.py call
 
-# run contract debugger
+# run contract debugger print all logs from solidity
 debug:
 	python3 ./Server/main.py debug

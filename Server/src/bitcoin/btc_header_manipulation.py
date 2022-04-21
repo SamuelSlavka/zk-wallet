@@ -52,6 +52,7 @@ class BlockHeader:
                         for i in range(0, len(newTarget), chunk_size)]
         splitHeaderStr = ' '.join(str(x) for x in splitHeader)
         return splitHeaderStr
+
     @property
     def header(self):
         """ Returns bit representation of header """
@@ -71,7 +72,6 @@ class BlockHeader:
                            for i in range(0, len(self.header.hex()), chunk_size)]
             self._zokratesHeader = ' '.join(str(x) for x in splitHeader)
         return self._zokratesHeader
-
 
     @property
     def zokratesTarget(self):

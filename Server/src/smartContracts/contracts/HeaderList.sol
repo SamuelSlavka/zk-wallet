@@ -57,7 +57,7 @@ contract HeaderList {
     }
 
     /// @dev Find fork contining hash at number or create a new one.
-    /// @param chainId id of current blockchain 0 - btc 1 - bch
+    /// @param chainId id of current blockchain  0,1 - btc 2,3 -bch
     /// @param prevHash Hash that we search for.
     /// @param number Start height.
     /// @return uint256 Fork Id.
@@ -94,7 +94,7 @@ contract HeaderList {
     }
 
     /// @dev Verifies array of batches and appedns them to storage.
-    /// @param chainId id of current blockchain 0,1 - btc 2,3 - bch
+    /// @param chainId id of current blockchain  0,1 - btc 2,3 -bch
     /// @param inputs Array of inputs containing proof and zok argument.
     /// @param startHeight Start height og batch.
     /// @param endHeight End height of the batch.
@@ -168,7 +168,7 @@ contract HeaderList {
     event ClosestHash(uint256);
 
     /// @dev Returns closest hash to given height.
-    /// @param chainId id of current blockchain 0 - btc 1 - bch
+    /// @param chainId id of current blockchain 0,1 - btc 2,3 -bch
     /// @param height Requested block height in blockchain.
     /// @param forkNumber Forknumber to search in initially should be 0.
     /// @return uint256[] - Closest block hash and its height.

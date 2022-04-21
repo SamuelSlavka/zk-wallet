@@ -16,16 +16,10 @@ def getPayload(id, params, function):
 
 def getBlockHeaders(chainId, begining, end):
     """ create proof for block number """
-    if (chainId == 0):
+    if (chainId == 0 or chainId == 1):
         token = BTCTOKEN
         provider = BTCPROVIDER
-    if (chainId == 1):
-        token = BTCTOKEN
-        provider = BTCPROVIDER
-    if (chainId == 2):
-        token = BCHTOKEN
-        provider = BCHPROVIDER
-    if (chainId == 3):
+    if (chainId == 2 or chainId == 3):
         token = BCHTOKEN
         provider = BCHPROVIDER
 
