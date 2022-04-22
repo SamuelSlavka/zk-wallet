@@ -14,8 +14,7 @@ public class NodeHolder {
     private static NodeHolder instance = null;
 
     // determines wether to use provider or regular network
-    // used because of peerless eth test networks :)
-    public Boolean isDevEnv = false;
+    public Boolean isDevEnv = Constants.DEVENV;
 
     private NodeHolder() {}
 

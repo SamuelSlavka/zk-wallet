@@ -28,13 +28,17 @@ if(sys.argv[1] == 'proof'):
 
 if(sys.argv[1] == 'deploy'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
+    logging.info('Deploying contract')
     acc = web3.eth.account.privateKeyToAccount(PRIVATE_KEY)
     if(web3.isConnected()):
+        logging.info('Connected')
         result = build_and_deploy(acc, web3)
         if(result):
             with open(os.getcwd()+'/Server/src/smartContracts/smartContractInfo', 'w') as file:
                 file.write(json.dumps(result))
                 logging.info('Contract at:'+result['contract_address'])
+    else:
+        logging.info("Could not connect to web3")
 
 if(sys.argv[1] == 'interact'):
     chainId = sys.argv[2]
@@ -49,7 +53,7 @@ if(sys.argv[1] == 'interact'):
             result = send_batches_to_contract(
                 chainId, start, end, acc, web3, contract['contract_address'], contract['abi'])
     else:
-        logging.info("could not connect to web3")
+        logging.info("Could not connect to web3")
 
 if(sys.argv[1] == 'call'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)

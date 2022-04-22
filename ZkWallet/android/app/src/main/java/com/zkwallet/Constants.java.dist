@@ -1,5 +1,6 @@
 package main.java.com.zkwallet;
 
 public class Constants {
-    public final static String PROVIDER= "REPLACEMEFORDEVENVIROMENT";
+    public final static String PROVIDER = "REPLACEMEFORDEVENVIROMENT";
+    public final static Boolean DEVENV = false;
 }

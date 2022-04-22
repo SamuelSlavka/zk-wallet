@@ -43,7 +43,7 @@ def deploy_contract(contractInterface, account, w3):
 
         # magic number to enable testnet interaction
         # remove if this ever gets to production!!
-        gasMultiplier = 6
+        gasMultiplier = 2
 
         # get gas
         gasPrice = w3.eth.generate_gas_price() * gasMultiplier
@@ -95,7 +95,7 @@ def send_batches_to_contract(blockchainId, start, end, account, w3, contract_add
             input = json.load(file)
             logging.info('Proof loaded')
             try:
-                gasMultiplier = 3
+                gasMultiplier = 2
                 # get gas
                 gasPrice = w3.eth.generate_gas_price() * gasMultiplier
                 logging.info('GasPrice: ' + str(gasPrice))

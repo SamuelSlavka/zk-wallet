@@ -6,7 +6,6 @@ stop:
 init: 
 	USER=$(id -u) GROUP=$(id -g)
 	docker-compose build
-	python3 ./Server/main.py compile
 
 # start dev enviroment
 dev:

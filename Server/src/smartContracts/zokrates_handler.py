@@ -31,7 +31,7 @@ def compile_validator():
         # # update contract
         subprocess.run('cp verifier.sol ../contracts/verifier.sol', shell=True, cwd=working_directory)
         logging.info('Updated verifier')
-        
+
         return True
     except Exception as err:
         logging.error("Error '{0}' occurred.".format(err))

@@ -69,8 +69,9 @@ create proof default for btc headers 0 to 32 and send it to contract
 
 
 ## Client setup
-  Fully described in ZkWallet
-  
+  SDK and cosntants are fully described in ZkWallet
+
+#### Client dev env execution:
     yarn react-native start
 
     yarn react-native run
