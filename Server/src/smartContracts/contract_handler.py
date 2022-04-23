@@ -41,9 +41,9 @@ def deploy_contract(contractInterface, account, w3):
             bytecode=contractInterface['bytecode']
         )
 
-        # magic number to enable testnet interaction
+        # magic number to enable quick testnet interaction
         # remove if this ever gets to production!!
-        gasMultiplier = 2
+        gasMultiplier = 4
 
         # get gas
         gasPrice = w3.eth.generate_gas_price() * gasMultiplier
@@ -91,31 +91,43 @@ def send_batches_to_contract(blockchainId, start, end, account, w3, contract_add
         )
         start = str(start)
         end = str(end)
-        with open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidity'+ blockchainId + start + end, 'r') as file:
-            input = json.load(file)
+                
+        try:
+            proofs = []
+            i = int(start)
+            while i < int(end):
+                file = open(os.getcwd()+'/Server/src/smartContracts/zokrates/solidity'+ blockchainId + str(i) + str(i+32), "r")
+                input = json.load(file)
+                proofs.append(input["proof"])
+                i += 32
+            
             logging.info('Proof loaded')
-            try:
-                gasMultiplier = 2
-                # get gas
-                gasPrice = w3.eth.generate_gas_price() * gasMultiplier
-                logging.info('GasPrice: ' + str(gasPrice))
+            gasMultiplier = 2
+            # get gas
+            gasPrice = w3.eth.generate_gas_price() * gasMultiplier
+            
+            logging.info('GasPrice: ' + str(gasPrice))
 
-                nonce = w3.eth.getTransactionCount(account.address)
-                logging.info('Building transaction...')
-                transaction = contract.functions.submitBatches(
-                    int(blockchainId), [input["proof"]], int(input["start"]), int(input["end"])).buildTransaction({'nonce': nonce, 'gasPrice': gasPrice})
-                signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
-                logging.info('Transaction created')
-                tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
-                logging.info('Transaction sent')
-                tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-                logging.info(tx_receipt)
-            except Exception as err:
-                logging.error(err)
-                logging.error('Failed to submit batches')
+            nonce = w3.eth.getTransactionCount(account.address)
+            logging.info('Building transaction...')
+            transaction = contract.functions.submitBatches(
+                int(blockchainId), proofs, int(start), int(end)).buildTransaction({'nonce': nonce, 'gasPrice': gasPrice})
 
+            # estimate gas
+            estgas = w3.eth.estimate_gas(transaction)
+            logging.info('Estimated gas: ' + str(estgas))                    
 
+            signed_transaction = w3.eth.account.sign_transaction(transaction, PRIVATE_KEY)
+            logging.info('Transaction created')
+            tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
+            logging.info('Transaction sent')
+            tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+            logging.info(tx_receipt)
+        except Exception as err:
+            logging.error(err)
+            logging.error('Failed to submit batches')
     return False
+
 
 
 def get_closest_hash(account, w3, contract_address, abi, height):

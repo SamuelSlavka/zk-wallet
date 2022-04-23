@@ -20,11 +20,17 @@ if(sys.argv[1] == 'compile'):
 if(sys.argv[1] == 'btcproof'):
     create_proof_for_chain(0, 1, 33)
 
+# generates proofs between start and end
 if(sys.argv[1] == 'proof'):
     chainId = sys.argv[2]
     start = sys.argv[3]
     end = sys.argv[4]
-    create_proof_for_chain(chainId, start, end)
+
+    i = int(start)
+    while i < int(end):
+        logging.info('Proofs for headers:' + 'from: ' + str(i) + ' to: ' +  str(i+32))
+        create_proof_for_chain(chainId, i, i+32)
+        i += 32
 
 if(sys.argv[1] == 'deploy'):
     web3 = init_eth_with_pk(PRIVATE_KEY, ETHPROVIDER)
