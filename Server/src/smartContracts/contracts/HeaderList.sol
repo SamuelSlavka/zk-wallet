@@ -170,13 +170,25 @@ contract HeaderList {
     /// @dev Returns closest hash to given height.
     /// @param chainId id of current blockchain 0,1 - btc 2,3 -bch
     /// @param height Requested block height in blockchain.
-    /// @param forkNumber Forknumber to search in initially should be 0.
     /// @return uint256[] - Closest block hash and its height.
     function getClosestHash(
         uint chainId,
+        uint height
+    ) public returns (uint256[] memory) {
+        Chain storage headerChain = chains[chainId];
+        return(getClosest(chainId, height, headerChain.mainFork));
+    }
+
+    /// @dev Returns closest hash to given height.
+    /// @param chainId id of current blockchain 0,1 - btc 2,3 -bch
+    /// @param height Requested block height in blockchain.
+    /// @param forkNumber Forknumber to search in initially should be 0.
+    /// @return uint256[] - Closest block hash and its height.
+    function getClosest(
+        uint chainId,
         uint height,
         uint forkNumber
-    ) public returns (uint256[] memory) {
+    ) private returns (uint256[] memory) {
         Chain storage headerChain = chains[chainId];
         // using undefined array length for geth warpper compatibility
         uint256[] memory ReturnVal = new uint256[](2);
@@ -195,7 +207,7 @@ contract HeaderList {
             } else if (i == mainFork.previousHeight) {
                 // if reached previous fork continue searching in it
                 return
-                    getClosestHash(
+                    getClosest(
                         chainId,
                         mainFork.previousHeight,
                         mainFork.previousFork

@@ -3,7 +3,12 @@
 ### A framework for mobile wallet that utilizes zk-SNARKs as a storage optimization technique. 
 Server is able to create zk-SNARK proofs of headers batch validity and publish them to smart contract. Client uses these proofs as checkpoints for its local header chain.
 
-## Initial setup
+## Requirements
+- docker
+- docker compose
+- yarn
+- metro
+- 
 
 For each file ending with `.dist` create file with the same name with the same contents, but without `.dist` ending. Afterwadrs replace all `REPLACEME` values with your prefered configuration.
 It is more consisely described in respective READMEs
@@ -27,12 +32,11 @@ Server uses rest api for providing up to date Contract address and abi. You can 
 Compilation is heavily dependant on number of headers in batches with proportional increase in ram:
 - 16 headers ~10GB ram local setup time: 20 minutes
 - 32 headers ~15GB ram local setup time: 40 minutes
-- 64 headers >30GB ram failed
 
-Currently zokrates is predefined for 32 header batches
+Included zokrates setup is predefined for 32 header batches
 
 #### Deploy current vesion of smart contract in smartContracts/build/contracts
-Uses validator created in `make compile`. Deploys to predefined provider in `constants.py`
+Uses validator genereated during `make compile`. Deploys to predefined provider in `constants.py`
 
     make deploy 
 
@@ -45,19 +49,20 @@ blockchain ids are constants set in smart contract:
 
 
 #### Custom proof and witness creation
+will create proofs for 32 sized chinks starting with [start height] and ending at [end height] if [end height] is lower than start of chunk+32 the proof will be genrated for start of chunk+32 anyways. It is computationaly heavy task.
+
+    python3 ./Server/main.py proof [blockchainId] [start height] [end height]
+
+Proof and witness generation:
+- 4 headers 1.5 GB ram
+- 8 headers 3 GB ram
+- 16 headers 6 GB ram
+- 32 headers 13 GB ram
+
+#### Proof publishing to smart contracti
+Will publish previosuly generated proofs. 
     
-    main.py proof [blockchainId] [start height] [end height]
-
-Witness generation:
-- 16 headers ~5GB ram time: 1:15s
-- 32 headers ~7GB ram time: 2:40s
-
-Proof generation:
-- 32 headers ~10GB ram time: 6:30s
-
-#### Custom interaction 
-    
-    main.py interact [blockchainId] [start height] [end height]
+    python3 ./Server/main.py interact [blockchainId] [start height] [end height]
 
 
 #### For zokrates and smart contract testing:

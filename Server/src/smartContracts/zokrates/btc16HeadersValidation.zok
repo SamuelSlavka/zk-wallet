@@ -1,0 +1,108 @@
+import "hashes/sha256/1024bit.zok" as sha256for1024
+import "hashes/sha256/256bitPadded.zok" as sha256for256
+
+import "utils/pack/bool/pack256.zok" as boolPack256
+import "utils/pack/u32/pack256.zok" as u32Pack256
+import "utils/pack/u32/unpack128.zok" as unpack128
+
+import "utils/casts/u32_from_bits.zok" as u32_from_bits
+import "utils/casts/u64_from_bits.zok" as u64_from_bits
+import "utils/casts/u32_to_bits.zok" as u32_to_bits
+import "utils/casts/u64_to_bits.zok" as u64_to_bits
+import "utils/casts/u32_to_field.zok" as u32_to_field
+import "utils/casts/u64_to_field.zok" as u64_to_field
+
+// changes endianess in u32
+def change_val_endianness(u32 input) -> u32:
+    bool[32] boolInput = u32_to_bits(input)
+    bool[32] boolTruncated = [...boolInput[24..32],...boolInput[16..24],...boolInput[8..16],...boolInput[0..8]]
+    return u32_from_bits(boolTruncated)
+
+// changes endianess in u32 array
+def change_array_endainnes(u32[8] input) -> u32[8]:
+    u32[8] changed = input
+    for u32 i in 0..8 do
+        changed[7-i] = change_val_endianness(input[i])
+    endfor
+    return changed
+
+// return previous block hash from header
+def get_prev_hash(u32[8] hash) -> field:
+    u32[8] res = change_array_endainnes(hash)
+    return u32Pack256(res)
+
+// returns traget from header place
+def get_target(u32 bits) -> field:
+    bool[32] boolBits = u32_to_bits(bits)
+
+    bool[32] head = [...[false;24],...boolBits[24..32]]
+    bool[32] tail = [...[false;8],...boolBits[16..24],...boolBits[8..16],...boolBits[0..8]]
+    
+    // remove length of tail
+    u64 inttail = u64_from_bits([...[false;32], ...tail])
+    // length of teraget of hex
+    u32 headInHex = (u32_from_bits(head)*2)-6
+    // number of shifts to left of head
+    u32 shiftsCount = headInHex % 16
+    // aditional 64b numbers 0 to append
+    u32 additionalFields = (headInHex-shiftsCount) / 16
+    // get num of bitwise shifts
+    shiftsCount = shiftsCount*4
+    for u32 i in 0..64 do
+        inttail = (i < shiftsCount) ? inttail << 1: inttail
+    endfor
+    
+    bool[64] bTarget = u64_to_bits(inttail)
+    // get resulting target and check if it is small enough for prefixing with 64 bits
+    // disregarding shifts of size 1 and 0 since its not going to happend in forseable future and saves us some porcesing power
+    bool[256] resTarget = (additionalFields == 3) ? [...bTarget, ...[false; (192)]] : [...[false; (64)], ...bTarget, ...[false; (128)]]
+    
+    field resTargetField = boolPack256(resTarget)
+    return resTargetField
+
+// make two sha256 on header
+def hash_block_header(u32[5][4] preimage) -> field:    
+    // combined into 256b fields and add padding
+    u32[8] preimage1 = [ ...preimage[0], ...preimage[1] ]
+    u32[8] preimage2 = [ ...preimage[2], ...preimage[3] ]
+    u32[8] preimage3 = [ ...preimage[4], 0x80000000,0x00000000,0x00000000,0x00000000 ]
+
+    u32[8] dummy = [ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000280 ]
+    
+    u32[8] intermediary = sha256for1024(preimage1, preimage2, preimage3, dummy)
+    u32[8] res = sha256for256(intermediary)
+    res = change_array_endainnes(res)
+	return u32Pack256(res)
+
+// takes in epoch and vaildates it
+def main(field[5] firstInputHeader, private field[15][5] inputHeaders, private field[15] inputCurrentHashes, field inputLastCurrentHash, field previousHash) -> bool:
+
+    field[16][5] headers = [firstInputHeader, ...inputHeaders]
+    field[16] currentHashes = [...inputCurrentHashes, inputLastCurrentHash]
+    
+    for u32 i in 0..16 do
+        u32[4] header0 = unpack128(headers[i][0])
+        u32[4] header1 = unpack128(headers[i][1])
+        u32[4] header2 = unpack128(headers[i][2])
+        u32[4] header3 = unpack128(headers[i][3])
+        u32[4] header4 = unpack128(headers[i][4])
+
+        // calculate header hash
+        field currentHashFromHeader = hash_block_header([header0,header1,header2,header3,header4])
+        
+        // calculate target form header
+        field target = get_target(header4[2])
+
+        // hash needs to be under target
+        assert((target) > (currentHashFromHeader))
+
+        // hash needs to equal hash calculated in server
+        assert(currentHashes[i] == currentHashFromHeader)
+        
+        // previous hash field in header needs to equal previous hash
+        field previousHashFromHeader = get_prev_hash( [...header0[1..4],...header1[0..4],header2[0]])
+        assert(previousHash == previousHashFromHeader)
+        // set previous hash to current hash
+        previousHash = currentHashFromHeader
+    endfor
+return true

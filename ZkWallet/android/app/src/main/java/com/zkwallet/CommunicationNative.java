@@ -163,15 +163,12 @@ public class CommunicationNative extends ReactContextBaseJavaModule {
 
             // configuring smart contract args
             Interface height = Geth.newInterface();
-            Interface startFork = Geth.newInterface();
             Interface chainId = Geth.newInterface();
             height.setBigInt(Geth.newBigInt(target));
-            startFork.setBigInt(Geth.newBigInt(0));
             chainId.setBigInt(Geth.newBigInt(blockchainId));
-            Interfaces params = Geth.newInterfaces(3);
+            Interfaces params = Geth.newInterfaces(2);
             params.set(0, chainId);
             params.set(1, height);
-            params.set(2, startFork);
 
             // configuring return
             Interface result = Geth.newInterface();

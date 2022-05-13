@@ -100,8 +100,10 @@ def send_batches_to_contract(blockchainId, start, end, account, w3, contract_add
                 input = json.load(file)
                 proofs.append(input["proof"])
                 i += 32
-            
-            logging.info('Proof loaded')
+            if proofs == []:
+                raise ValueError('No proofs found')
+
+            logging.info('Loaded input proofs')
             gasMultiplier = 2
             # get gas
             gasPrice = w3.eth.generate_gas_price() * gasMultiplier
@@ -137,6 +139,6 @@ def get_closest_hash(account, w3, contract_address, abi, height):
             address=contract_address,
             abi=abi
         )
-        result = contract.functions.getClosestHash(0, height, 0).call()
+        result = contract.functions.getClosestHash(0, height).call()
         logging.info(result)
     return False

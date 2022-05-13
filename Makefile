@@ -19,17 +19,17 @@ compile:
 deploy:
 	python3 ./Server/main.py deploy
 
-# create btc proofs headers 0 to 129
+# create btc proofs headers 0 to 97
 proof:
-	python3 ./Server/main.py proof 0 1 129
+	python3 ./Server/main.py proof 0 1 97
 
 # interact with smart contract publishing proof of btc headers 0 to 32
 interact:
 	python3 ./Server/main.py interact 0 1 33
 
-# interact with 10 batches
+# interact with 3 batches
 interact10:
-	python3 ./Server/main.py interact 0 1 321
+	python3 ./Server/main.py interact 0 1 97
 
 # call contract get closest header method for btc
 call:

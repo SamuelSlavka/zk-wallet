@@ -2,7 +2,7 @@ PRIVATE_KEY='REPLACEME'
 
 #ETH
 ETHTOKEN='REPLACEME'
-ETHPROVIDER='https://ethshared.bdnodes.net?auth='+ETHTOKEN
+ETHPROVIDER='https://ropstenshared.bdnodes.net?auth='+ETHTOKEN
 ETHGRAPH='https://ethshared.bdnodes.net/graphql'
 
 #BTC
