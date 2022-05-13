@@ -5,17 +5,13 @@ Server is able to create zk-SNARK proofs of headers batch validity and publish t
 
 ## Requirements
 - docker
-- docker compose
+- docker-compose
 - yarn
 - metro
-- 
-
-For each file ending with `.dist` create file with the same name with the same contents, but without `.dist` ending. Afterwadrs replace all `REPLACEME` values with your prefered configuration.
-It is more consisely described in respective READMEs
 
 ## Server setup
+Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary. Constants and functionality are fully described in `./Server/README.md` 
 
-Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary.
 #### Build docker and compile zokratess program
 
     make init
@@ -49,7 +45,7 @@ blockchain ids are constants set in smart contract:
 
 
 #### Custom proof and witness creation
-will create proofs for 32 sized chinks starting with [start height] and ending at [end height] if [end height] is lower than start of chunk+32 the proof will be genrated for start of chunk+32 anyways. It is computationaly heavy task.
+will create proofs for 32 header sized chinks starting with [start height] and ending at [end height] if [end height] is lower than start of chunk+32 the proof will be genrated for start of chunk+32 anyway. It is also a computationaly heavy task.
 
     python3 ./Server/main.py proof [blockchainId] [start height] [end height]
 
@@ -60,13 +56,13 @@ Proof and witness generation:
 - 32 headers 13 GB ram
 
 #### Proof publishing to smart contracti
-Will publish previosuly generated proofs. 
+Will publish previosuly generated proofs when wider range than 32 the proofs will be batched into single message, creating only one chckpoin. 
     
     python3 ./Server/main.py interact [blockchainId] [start height] [end height]
 
 
 #### For zokrates and smart contract testing:
-create proof default for btc headers 0 to 32 and send it to contract 
+Create proof default for btc headers 0 to 32 and send it to the contract.
 
     make proof
 
@@ -74,10 +70,22 @@ create proof default for btc headers 0 to 32 and send it to contract
 
 
 ## Client setup
-  SDK and cosntants are fully described in ZkWallet
+
+  SDK and cosntants are fully described in `./ZkWallet/README.md` 
 
 #### Client dev env execution:
+
     yarn react-native start
 
     yarn react-native run
 
+
+## General testing
+
+Provided makefile also contains an easy to execute shotcuts for testig. It uses previously mentioned python script.
+- Creates proof for first 32 headers.
+    make proof 
+- Submits the previously created proof to smart contract
+    make intercat
+- Calls clients function to check current head of smart contract header chain.
+    make call

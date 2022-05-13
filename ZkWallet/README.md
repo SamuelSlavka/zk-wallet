@@ -34,15 +34,12 @@ rename `Constants.java.dist` with `Constants.java`
     yarn react-native start
 
 ## execute the applicaiton 
-There are two options: running in emulator or running in android device directly.
+There are two options: running in emulator or running in android device is not currently supported since contract info needs to be routed to the device from server.
 #### Run android emulator 
 This has different paths at each system and requires a lot of dependencies basic setup is as follows:
  - Install `SDK` with: `apt install android-sdk`
  - Define location with an `ANDROID_SDK_ROOT` environment variable or by setting the sdk.dir path in your project's local properties file at `/ZkWallet/android/local.properties`, usually as `sdk.dir = /Users/USERNAME/Library/Android/sdk`
  - Install emulator name [emulator] with avdmanager
     cd ~/Android/Sdk/emulator && ./emulator -avd [emulator]
-
-#### Run android device
-In metro server select run in device. The device needs to have USB debugging enabled and needs to be conneected with usb to the pc.
 
 

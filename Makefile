@@ -1,7 +1,3 @@
-# for me only :)
-stop:
-	systemctl stop apache2.service
-
 # build all the stuff
 init: 
 	USER=$(id -u) GROUP=$(id -g)
@@ -19,9 +15,9 @@ compile:
 deploy:
 	python3 ./Server/main.py deploy
 
-# create btc proofs headers 0 to 97
+# create btc proofs headers 0 to 33
 proof:
-	python3 ./Server/main.py proof 0 1 97
+	python3 ./Server/main.py proof 0 1 33
 
 # interact with smart contract publishing proof of btc headers 0 to 32
 interact:
@@ -29,7 +25,7 @@ interact:
 
 # interact with 3 batches
 interact10:
-	python3 ./Server/main.py interact 0 1 97
+	python3 ./Server/main.py interact 0 33 97
 
 # call contract get closest header method for btc
 call:
