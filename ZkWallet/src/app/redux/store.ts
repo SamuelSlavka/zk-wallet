@@ -14,25 +14,34 @@ const persistEthConfig = {
   whitelist: ['keyfile', 'contract', 'closestHash'],
 };
 
-/* in production use this whitlist
-  whitelist: [
-    'btcHeaders',
-    'btcCreadentails',
-    'btcValidHeaders',
-    'btcValidTransactions',
-  ],
-*/
+// for testing purposes use following whitelists
+// const btcWhitelist = ['btcHeaders', 'btcCreadentails'];
+// const bchWhitelist = ['bchHeaders', 'bchCreadentails'];
+
+// in production use this whitlist
+const btcWhitelist = [
+  'btcHeaders',
+  'btcCreadentails',
+  'btcValidHeaders',
+  'btcValidTransactions',
+];
+const bchWhitelist = [
+  'bchHeaders',
+  'bchCreadentails',
+  'bchValidHeaders',
+  'bchValidTransactions',
+];
 
 const persistBtcConfig = {
   key: 'btc',
   storage: AsyncStorage,
-  whitelist: ['btcHeaders', 'btcCreadentails'],
+  whitelist: btcWhitelist,
 };
 
 const persistBchConfig = {
   key: 'bch',
   storage: AsyncStorage,
-  whitelist: ['bchHeaders', 'bchCreadentails'],
+  whitelist: bchWhitelist,
 };
 
 const rootReducer = combineReducers({

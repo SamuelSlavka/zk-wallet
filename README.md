@@ -8,6 +8,7 @@ Server is able to create zk-SNARK proofs of headers batch validity and publish t
 - docker-compose
 - yarn
 - metro
+- python3
 
 ## Server setup
 Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary. Constants and functionality are fully described in `./Server/README.md` 
@@ -22,14 +23,9 @@ Server uses rest api for providing up to date Contract address and abi. You can 
 
 ## Smart contracts setup
 #### Compile and setup zokrates (warning creates toxic waste)
+Included zokrates setup is predefined for 32 header batches
 
     make compile
-
-Compilation is heavily dependant on number of headers in batches with proportional increase in ram:
-- 16 headers ~10GB ram local setup time: 20 minutes
-- 32 headers ~15GB ram local setup time: 40 minutes
-
-Included zokrates setup is predefined for 32 header batches
 
 #### Deploy current vesion of smart contract in smartContracts/build/contracts
 Uses validator genereated during `make compile`. Deploys to predefined provider in `constants.py`
@@ -39,9 +35,9 @@ Uses validator genereated during `make compile`. Deploys to predefined provider 
 blockchain ids are constants set in smart contract:
 
 - 0 - btc starting in genesis  
-- 1 - btc starting in some test block   
+- 1 - btc starting in a test block   
 - 2 - bch starting in genesis
-- 3 - bch starting in some test block
+- 3 - bch starting in a test block
 
 
 #### Custom proof and witness creation
@@ -49,24 +45,10 @@ will create proofs for 32 header sized chinks starting with [start height] and e
 
     python3 ./Server/main.py proof [blockchainId] [start height] [end height]
 
-Proof and witness generation:
-- 4 headers 1.5 GB ram
-- 8 headers 3 GB ram
-- 16 headers 6 GB ram
-- 32 headers 13 GB ram
-
-#### Proof publishing to smart contracti
+#### Proof publishing to smart contract
 Will publish previosuly generated proofs when wider range than 32 the proofs will be batched into single message, creating only one chckpoin. 
     
     python3 ./Server/main.py interact [blockchainId] [start height] [end height]
-
-
-#### For zokrates and smart contract testing:
-Create proof default for btc headers 0 to 32 and send it to the contract.
-
-    make proof
-
-    make interact
 
 
 ## Client setup
@@ -79,6 +61,26 @@ Create proof default for btc headers 0 to 32 and send it to the contract.
 
     yarn react-native run
 
+## File structure
+    ./Nginx - proxy point
+    ./Server - server implementation
+        /src/bitcoin - bitcoin data gathering and parsing implementation
+        /src/ethereum - ethereum contract deployment and interaction
+        /src/utils - general utils
+        /src/smartContracts - contracts and zokrates handlers
+            /contracts  - contract programs
+            /zokrates - zokrates program and generated data
+    ./ZkWallet - wallet implementation
+        /android/app/src/main/java/com/zkwallet - Native module implementation with geth instatiation
+        /src - main react native module
+            /app - app files
+                /components - app components
+                /config - global constants
+                /navigation - navigation configuration
+                /redux - state managment
+                /screens - screen components
+                /utilities - general utilities
+    ./Zokrates - functioning zokrates toolbox
 
 ## General testing
 
