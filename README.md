@@ -10,17 +10,6 @@ Server is able to create zk-SNARK proofs of headers batch validity and publish t
 - metro
 - python3
 
-## Server setup
-Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary. Constants and functionality are fully described in `./Server/README.md` 
-
-#### Build docker and compile zokratess program
-
-    make init
-
-#### Run dockerized flask
-
-    make dev
-
 ## Smart contracts setup
 #### Compile and setup zokrates (warning creates toxic waste)
 Included zokrates setup is predefined for 32 header batches
@@ -28,7 +17,7 @@ Included zokrates setup is predefined for 32 header batches
     make compile
 
 #### Deploy current vesion of smart contract in smartContracts/build/contracts
-Uses validator genereated during `make compile`. Deploys to predefined provider in `constants.py`
+Uses validator genereated during `make compile`. Deploys to predefined provider in `constants.py`.
 
     make deploy 
 
@@ -41,7 +30,7 @@ blockchain ids are constants set in smart contract:
 
 
 #### Custom proof and witness creation
-will create proofs for 32 header sized chinks starting with [start height] and ending at [end height] if [end height] is lower than start of chunk+32 the proof will be genrated for start of chunk+32 anyway. It is also a computationaly heavy task.
+Will create proofs for 32 header sized chinks starting with [start height] and ending at [end height] if [end height] is lower than start of chunk+32 the proof will be genrated for start of chunk+32 anyway. It is also a computationaly heavy task.
 
     python3 ./Server/main.py proof [blockchainId] [start height] [end height]
 
@@ -60,6 +49,18 @@ Will publish previosuly generated proofs when wider range than 32 the proofs wil
     yarn react-native start
 
     yarn react-native run
+
+
+## Server setup
+Server uses rest api for providing up to date Contract address and abi. You can configure them in the app as constants and server will be unecessary. Constants and functionality are fully described in `./Server/README.md` 
+
+#### Build docker image
+
+    make init
+
+#### Run dockerized flask
+
+    make dev
 
 ## File structure
     ./Nginx - proxy point
