@@ -132,13 +132,13 @@ def send_batches_to_contract(blockchainId, start, end, account, w3, contract_add
 
 
 
-def get_closest_hash(account, w3, contract_address, abi, height):
+def get_closest_hash(account, w3, contract_address, abi, height, chainId):
     """ Calls contract method """
     if(w3.isConnected()):
         contract = w3.eth.contract(
             address=contract_address,
             abi=abi
         )
-        result = contract.functions.getClosestHash(0, height).call()
+        result = contract.functions.getClosestHash(chainId, height).call()
         logging.info(result)
     return False

@@ -29,7 +29,7 @@ interact10:
 
 # call contract get closest header method for btc
 call:
-	python3 ./Server/main.py call
+	python3 ./Server/main.py call 0
 
 # run contract debugger print all logs from solidity
 debug:
